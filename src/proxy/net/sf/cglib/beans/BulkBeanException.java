@@ -15,13 +15,13 @@
  */
 package net.sf.cglib.beans;
 
-import net.sf.cglib.core.CodeGenerationException;
 
 public class BulkBeanException extends RuntimeException
 {
-    private int index;
+	private static final long serialVersionUID = 1L;
+	private int index;
     private Throwable cause;
-    
+
     public BulkBeanException(String message, int index) {
         super(message);
         this.index = index;
@@ -36,7 +36,7 @@ public class BulkBeanException extends RuntimeException
     public int getIndex() {
         return index;
     }
-    
+
     public Throwable getCause() {
         return cause;
     }

@@ -15,11 +15,10 @@
  */
 package net.sf.cglib.beans;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.*;
-import net.sf.cglib.core.*;
+import net.sf.cglib.core.AbstractClassGenerator;
+import net.sf.cglib.core.KeyFactory;
+import net.sf.cglib.core.ReflectUtils;
+
 import org.objectweb.asm.ClassVisitor;
 
 /**
@@ -27,16 +26,15 @@ import org.objectweb.asm.ClassVisitor;
  */
 abstract public class BulkBean
 {
-    private static final BulkBeanKey KEY_FACTORY =
-      (BulkBeanKey)KeyFactory.create(BulkBeanKey.class);
+    private static final BulkBeanKey KEY_FACTORY = KeyFactory.create(BulkBeanKey.class);
 
     interface BulkBeanKey {
         public Object newInstance(String target, String[] getters, String[] setters, String[] types);
     }
 
-    protected Class target;
+    protected Class<?> target;
     protected String[] getters, setters;
-    protected Class[] types;
+    protected Class<?>[] types;
 
     protected BulkBean() { }
 
@@ -49,7 +47,7 @@ abstract public class BulkBean
         return values;
     }
 
-    public Class[] getPropertyTypes() {
+    public Class<?>[] getPropertyTypes() {
         return (Class[])types.clone();
     }
 
@@ -61,7 +59,7 @@ abstract public class BulkBean
         return (String[])setters.clone();
     }
 
-    public static BulkBean create(Class target, String[] getters, String[] setters, Class[] types) {
+    public static BulkBean create(Class<?> target, String[] getters, String[] setters, Class<?>[] types) {
         Generator gen = new Generator();
         gen.setTarget(target);
         gen.setGetters(getters);
@@ -70,18 +68,18 @@ abstract public class BulkBean
         return gen.create();
     }
 
-    public static class Generator extends AbstractClassGenerator {
+    public static class Generator extends AbstractClassGenerator<BulkBean> {
         private static final Source SOURCE = new Source(BulkBean.class.getName());
-        private Class target;
+        private Class<?> target;
         private String[] getters;
         private String[] setters;
-        private Class[] types;
+        private Class<?>[] types;
 
         public Generator() {
             super(SOURCE);
         }
 
-        public void setTarget(Class target) {
+        public void setTarget(Class<?> target) {
             this.target = target;
         }
 
@@ -93,7 +91,7 @@ abstract public class BulkBean
             this.setters = setters;
         }
 
-        public void setTypes(Class[] types) {
+        public void setTypes(Class<?>[] types) {
             this.types = types;
         }
 
@@ -106,15 +104,16 @@ abstract public class BulkBean
             String targetClassName = target.getName();
             String[] typeClassNames = ReflectUtils.getNames(types);
             Object key = KEY_FACTORY.newInstance(targetClassName, getters, setters, typeClassNames);
-            return (BulkBean)super.create(key);
+            return super.create(key);
         }
 
         public void generateClass(ClassVisitor v) throws Exception {
             new BulkBeanEmitter(v, getClassName(), target, getters, setters, types);
         }
 
-        protected Object firstInstance(Class type) {
-            BulkBean instance = (BulkBean)ReflectUtils.newInstance(type);
+        @Override
+        protected BulkBean firstInstance(Class<BulkBean> type) {
+            BulkBean instance = ReflectUtils.newInstance(type);
             instance.target = target;
 
             int length = getters.length;

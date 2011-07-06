@@ -24,18 +24,17 @@ import org.objectweb.asm.Type;
 /**
  * @author Juozas Baliuka, Chris Nokleberg
  */
-public class BeanGenerator extends AbstractClassGenerator
+public class BeanGenerator<T> extends AbstractClassGenerator<T>
 {
     private static final Source SOURCE = new Source(BeanGenerator.class.getName());
-    private static final BeanGeneratorKey KEY_FACTORY =
-      (BeanGeneratorKey)KeyFactory.create(BeanGeneratorKey.class);
+    private static final BeanGeneratorKey KEY_FACTORY = KeyFactory.create(BeanGeneratorKey.class);
 
     interface BeanGeneratorKey {
-        public Object newInstance(String superclass, Map props);
+        public Object newInstance(String superclass, Map<String, Type> props);
     }
 
-    private Class superclass;
-    private Map props = new HashMap();
+    private Class<T> superclass;
+    private Map<String, Type> props = new HashMap<String, Type>();
 
     public BeanGenerator() {
         super(SOURCE);
@@ -47,14 +46,14 @@ public class BeanGenerator extends AbstractClassGenerator
      * no-argument constructor.
      * @param superclass class to extend, or null to extend Object
      */
-    public void setSuperclass(Class superclass) {
+    public void setSuperclass(Class<T> superclass) {
         if (superclass != null && superclass.equals(Object.class)) {
             superclass = null;
         }
         this.superclass = superclass;
     }
 
-    public void addProperty(String name, Class type) {
+    public void addProperty(String name, Class<?> type) {
         if (props.containsKey(name)) {
             throw new IllegalArgumentException("Duplicate property name \"" + name + "\"");
         }
@@ -104,22 +103,23 @@ public class BeanGenerator extends AbstractClassGenerator
         ce.end_class();
     }
 
-    protected Object firstInstance(Class type) {
+    @Override
+    protected T firstInstance(Class<T> type) {
         return ReflectUtils.newInstance(type);
     }
 
-    public static void addProperties(BeanGenerator gen, Map props) {
-        for (Iterator it = props.keySet().iterator(); it.hasNext();) {
+    public static <T> void addProperties(BeanGenerator<T> gen, Map<String, Class<?>> props) {
+        for (Iterator<String> it = props.keySet().iterator(); it.hasNext();) {
             String name = (String)it.next();
-            gen.addProperty(name, (Class)props.get(name));
+            gen.addProperty(name, props.get(name));
         }
     }
 
-    public static void addProperties(BeanGenerator gen, Class type) {
+    public static <T> void addProperties(BeanGenerator<T> gen, Class<?> type) {
         addProperties(gen, ReflectUtils.getBeanProperties(type));
     }
 
-    public static void addProperties(BeanGenerator gen, PropertyDescriptor[] descriptors) {
+    public static <T> void addProperties(BeanGenerator<T> gen, PropertyDescriptor[] descriptors) {
         for (int i = 0; i < descriptors.length; i++) {
             gen.addProperty(descriptors[i].getName(), descriptors[i].getPropertyType());
         }

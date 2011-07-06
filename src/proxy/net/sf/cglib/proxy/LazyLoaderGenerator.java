@@ -17,20 +17,21 @@ package net.sf.cglib.proxy;
 
 import java.util.*;
 import net.sf.cglib.core.*;
+
 import org.objectweb.asm.Label;
 import org.objectweb.asm.Type;
 
 class LazyLoaderGenerator implements CallbackGenerator {
     public static final LazyLoaderGenerator INSTANCE = new LazyLoaderGenerator();
 
-    private static final Signature LOAD_OBJECT = 
+    private static final Signature LOAD_OBJECT =
       TypeUtils.parseSignature("Object loadObject()");
     private static final Type LAZY_LOADER =
       TypeUtils.parseType("net.sf.cglib.proxy.LazyLoader");
 
-    public void generate(ClassEmitter ce, Context context, List methods) {
-        Set indexes = new HashSet();
-        for (Iterator it = methods.iterator(); it.hasNext();) {
+    public void generate(ClassEmitter ce, Context context, List<MethodInfo> methods) {
+        Set<Integer> indexes = new HashSet<Integer>();
+        for (Iterator<MethodInfo> it = methods.iterator(); it.hasNext();) {
             MethodInfo method = (MethodInfo)it.next();
             if (TypeUtils.isProtected(method.getModifiers())) {
                 // ignore protected methods
@@ -49,7 +50,7 @@ class LazyLoaderGenerator implements CallbackGenerator {
             }
         }
 
-        for (Iterator it = indexes.iterator(); it.hasNext();) {
+        for (Iterator<Integer> it = indexes.iterator(); it.hasNext();) {
             int index = ((Integer)it.next()).intValue();
 
             String delegate = "CGLIB$LAZY_LOADER_" + index;
@@ -74,7 +75,7 @@ class LazyLoaderGenerator implements CallbackGenerator {
             e.mark(end);
             e.return_value();
             e.end_method();
-            
+
         }
     }
 
@@ -84,5 +85,5 @@ class LazyLoaderGenerator implements CallbackGenerator {
                              Constants.TYPES_EMPTY);
     }
 
-    public void generateStatic(CodeEmitter e, Context context, List methods) { }
+    public void generateStatic(CodeEmitter e, Context context, List<MethodInfo> methods) { }
 }

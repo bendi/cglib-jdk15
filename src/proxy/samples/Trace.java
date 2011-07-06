@@ -6,30 +6,31 @@ import java.util.*;
  * @author  baliuka
  */
 public class Trace implements MethodInterceptor {
-    
+
     int ident = 1;
     static Trace callback = new Trace();
-    
+
     /** Creates a new instance of Trace */
     private Trace() {
     }
-    
-    public static  Object newInstance( Class clazz ){
+
+    public static  <T> T newInstance( Class<T> clazz ){
       try{
-            Enhancer e = new Enhancer();
+            Enhancer<T> e = new Enhancer<T>();
             e.setSuperclass(clazz);
             e.setCallback(callback);
             return e.create();
       }catch( Throwable e ){
-         e.printStackTrace(); 
+         e.printStackTrace();
          throw new Error(e.getMessage());
-      }  
-    
+      }
+
     }
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) {
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	public static void main(String[] args) {
         List list = (List)newInstance(Vector.class);
         Object value = "TEST";
         list.add(value);
@@ -37,13 +38,13 @@ public class Trace implements MethodInterceptor {
         try{
          list.set(2, "ArrayIndexOutOfBounds" );
         }catch( ArrayIndexOutOfBoundsException ignore ){
-        
+
         }
        list.add(value + "1");
        list.add(value + "2");
        list.toString();
-       list.equals(list); 
-       list.set( 0, null ); 
+       list.equals(list);
+       list.set( 0, null );
        list.toString();
        list.add(list);
        list.get(1);
@@ -60,7 +61,7 @@ public class Trace implements MethodInterceptor {
         printIdent(ident);
         System.out.println( method );
         for( int i = 0; i < args.length; i++ ){
-          printIdent(ident);   
+          printIdent(ident);
           System.out.print( "arg" + (i + 1) + ": ");
           if( obj == args[i])
               System.out.println("this");
@@ -75,31 +76,31 @@ public class Trace implements MethodInterceptor {
             ident--;
         } catch (Throwable t) {
             ident--;
-            printIdent(ident);   
-            System.out.println("throw " + t );  
+            printIdent(ident);
+            System.out.println("throw " + t );
             System.out.println();
             throw t.fillInStackTrace();
         }
-        
-        printIdent(ident); 
+
+        printIdent(ident);
         System.out.print("return " );
         if( obj == retValFromSuper)
             System.out.println("this");
         else System.out.println(retValFromSuper);
-        
+
         if(ident == 1)
              System.out.println();
-        
+
         return retValFromSuper;
     }
-    
+
    void printIdent( int ident ){
-       
-    
+
+
        while( --ident > 0 ){
          System.out.print(".......");
        }
       System.out.print("  ");
    }
-    
+
 }

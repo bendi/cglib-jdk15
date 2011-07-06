@@ -15,16 +15,13 @@
  */
 package net.sf.cglib.reflect;
 
-import java.io.*;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.*;
-import junit.framework.*;
-import net.sf.cglib.core.ClassGenerator;
-import net.sf.cglib.core.DefaultGeneratorStrategy;
-import net.sf.cglib.transform.ClassTransformerTee;
-import net.sf.cglib.transform.TransformingClassGenerator;
+
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 public class TestFastClass extends net.sf.cglib.CodeGenTestCase {
     public static class Simple {
@@ -42,7 +39,7 @@ public class TestFastClass extends net.sf.cglib.CodeGenTestCase {
     }
 
     public void testException() throws Throwable {
-        FastClass fc = FastClass.create(ThrowsSomething.class);
+        FastClass<ThrowsSomething> fc = FastClass.create(ThrowsSomething.class);
         ThrowsSomething ts = new ThrowsSomething();
         try {
             fc.invoke("foo", new Class[0], ts, new Object[0]);
@@ -55,13 +52,13 @@ public class TestFastClass extends net.sf.cglib.CodeGenTestCase {
     public static class Child extends net.sf.cglib.reflect.sub.Parent { }
 
     public void testSuperclass() throws Throwable {
-        FastClass fc = FastClass.create(Child.class);
+        FastClass<Child> fc = FastClass.create(Child.class);
         assertEquals("dill", new Child().getHerb());
         assertEquals("dill", fc.invoke("getHerb", new Class[0], new Child(), new Object[0]));
     }
 
     public void testTypeMismatch() throws Throwable {
-        FastClass fc = FastClass.create(ThrowsSomething.class);
+        FastClass<ThrowsSomething> fc = FastClass.create(ThrowsSomething.class);
         ThrowsSomething ts = new ThrowsSomething();
         try {
             fc.invoke("foo", new Class[]{ Integer.TYPE }, ts, new Object[0]);
@@ -70,15 +67,15 @@ public class TestFastClass extends net.sf.cglib.CodeGenTestCase {
     }
 
     public void testComplex() throws Throwable {
-        FastClass fc = FastClass.create(MemberSwitchBean.class);
-        MemberSwitchBean bean = (MemberSwitchBean)fc.newInstance();
+        FastClass<MemberSwitchBean> fc = FastClass.create(MemberSwitchBean.class);
+        MemberSwitchBean bean = fc.newInstance();
         assertTrue(bean.init == 0);
         assertTrue(fc.getName().equals("net.sf.cglib.reflect.MemberSwitchBean"));
         assertTrue(fc.getJavaClass() == MemberSwitchBean.class);
         assertTrue(fc.getMaxIndex() == 19);
 
-        Constructor c1 = MemberSwitchBean.class.getConstructor(new Class[0]);
-        FastConstructor fc1 = fc.getConstructor(c1);
+        Constructor<MemberSwitchBean> c1 = MemberSwitchBean.class.getConstructor(new Class[0]);
+        FastConstructor<MemberSwitchBean> fc1 = fc.getConstructor(c1);
         assertTrue(((MemberSwitchBean)fc1.newInstance()).init == 0);
         assertTrue(fc1.toString().equals("public net.sf.cglib.reflect.MemberSwitchBean()"));
 
@@ -91,14 +88,12 @@ public class TestFastClass extends net.sf.cglib.CodeGenTestCase {
     }
 
     public void testStatic() throws Throwable {
-        FastClass fc = FastClass.create(MemberSwitchBean.class);
+        FastClass<MemberSwitchBean> fc = FastClass.create(MemberSwitchBean.class);
         // MemberSwitchBean bean = (MemberSwitchBean)fc.newInstance();
         assertTrue(fc.invoke("staticMethod", new Class[0], null, null).equals(new Integer(10)));
     }
 
     private static abstract class ReallyBigClass {
-        public ReallyBigClass() {
-        }
         abstract public void method1(int i, short s, float f);
         abstract public void method1(int i, byte d, float f);
         abstract public void method2(int i, short s, float f);
@@ -582,33 +577,33 @@ public class TestFastClass extends net.sf.cglib.CodeGenTestCase {
         abstract public void methodB120(int i, short s, float f);
         abstract public void methodB120(int i, byte d, float f);
     }
-    
+
     public void testReallyBigClass() throws IOException {
-        FastClass.Generator gen = new FastClass.Generator();
+        FastClass.Generator<ReallyBigClass> gen = new FastClass.Generator<ReallyBigClass>();
         gen.setType(ReallyBigClass.class);
-        FastClass fc = gen.create();
+        gen.create();
     }
 
     public TestFastClass(String testName) {
         super(testName);
     }
-    
+
     public static void main(String[] args) {
         junit.textui.TestRunner.run(suite());
     }
-    
+
     public static Test suite() {
         return new TestSuite(TestFastClass.class);
     }
-    
+
     public void perform(ClassLoader loader) throws Throwable {
         FastClass.create(loader,Simple.class).newInstance();
     }
-    
+
     public void testFailOnMemoryLeak() throws Throwable {
         if(leaks()){
           fail("Memory Leak in FastClass");
         }
     }
-    
+
 }

@@ -1,12 +1,12 @@
 /*
  * Copyright 2003,2004 The Apache Software Foundation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -15,18 +15,29 @@
  */
 package net.sf.cglib.transform;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
-import java.util.*;
-import java.util.zip.*;
+import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
-import net.sf.cglib.core.*;
-import org.apache.tools.ant.*;
-import org.apache.tools.ant.BuildException;
-import org.apache.tools.ant.ProjectComponent;
-import org.objectweb.asm.*;
+import net.sf.cglib.core.ClassNameReader;
+import net.sf.cglib.core.DebuggingClassWriter;
+
+import org.apache.tools.ant.Project;
+import org.objectweb.asm.Attribute;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassWriter;
 
 abstract public class AbstractTransformTask extends AbstractProcessTask {
     private static final int ZIP_MAGIC = 0x504B0304;
@@ -41,10 +52,10 @@ abstract public class AbstractTransformTask extends AbstractProcessTask {
 
     /**
      * returns transformation for source class
-     * 
+     *
      * @param classInfo
-     *            class information 
-     *            class name := classInfo[ 0 ] 
+     *            class information
+     *            class name := classInfo[ 0 ]
      *            super class  name := classInfo[ 1 ]
      *            interfaces := classInfo[ >1 ]
      */
@@ -65,9 +76,9 @@ abstract public class AbstractTransformTask extends AbstractProcessTask {
             processJarFile(file);
 
         } else {
-            
+
             log("ignoring " + file.toURL(), Project.MSG_WARN);
-            
+
         }
     }
 
@@ -130,46 +141,46 @@ abstract public class AbstractTransformTask extends AbstractProcessTask {
         if (verbose) {
             log("processing " + file.toURL());
         }
-        
+
         File tempFile = File.createTempFile(file.getName(), null, new File(file
                 .getAbsoluteFile().getParent()));
         try{
-            
+
             ZipInputStream zip = new ZipInputStream(new FileInputStream(file));
             try {
                 FileOutputStream fout = new FileOutputStream(tempFile);
                 try{
                  ZipOutputStream out = new ZipOutputStream(fout);
-                                
+
                     ZipEntry entry;
                     while ((entry = zip.getNextEntry()) != null) {
-                        
-                        
+
+
                         byte bytes[] = getBytes(zip);
-                        
+
                         if (!entry.isDirectory()) {
-                            
+
                             DataInputStream din = new DataInputStream(
                                               new ByteArrayInputStream(bytes)
                                             );
-                            
+
                             if (din.readInt() == CLASS_MAGIC) {
-                                
+
                                 bytes = process(bytes);
-                                                        
+
                             } else {
                                 if (verbose) {
                                  log("ignoring " + entry.toString());
                                 }
                             }
                         }
-                       
+
                         ZipEntry outEntry = new ZipEntry(entry.getName());
                         outEntry.setMethod(entry.getMethod());
                         outEntry.setComment(entry.getComment());
                         outEntry.setSize(bytes.length);
-                        
-                        
+
+
                         if(outEntry.getMethod() == ZipEntry.STORED){
                             CRC32 crc = new CRC32();
                             crc.update(bytes);
@@ -180,35 +191,35 @@ abstract public class AbstractTransformTask extends AbstractProcessTask {
                         out.write(bytes);
                         out.closeEntry();
                         zip.closeEntry();
-                        
+
                     }
-                    out.close(); 
+                    out.close();
                 }finally{
-                 fout.close();    
-                } 
+                 fout.close();
+                }
             } finally {
                 zip.close();
             }
-            
-            
+
+
             if(file.delete()){
-                
+
                 File newFile = new File(tempFile.getAbsolutePath());
-                
+
                 if(!newFile.renameTo(file)){
-                    throw new IOException("can not rename " + tempFile + " to " + file);   
+                    throw new IOException("can not rename " + tempFile + " to " + file);
                 }
-                
+
             }else{
                 throw new IOException("can not delete " + file);
             }
-            
+
         }finally{
-            
+
             tempFile.delete();
-            
+
         }
-        
+
     }
 
     /**
@@ -257,7 +268,7 @@ abstract public class AbstractTransformTask extends AbstractProcessTask {
         DataInputStream in = new DataInputStream(new FileInputStream(file));
         try {
             int m = in.readInt();
-            return magic == m; 
+            return magic == m;
         } finally {
             in.close();
         }

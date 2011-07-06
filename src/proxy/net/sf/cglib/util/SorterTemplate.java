@@ -15,7 +15,6 @@
  */
 package net.sf.cglib.util;
 
-import java.util.*;
 
 abstract class SorterTemplate {
     private static final int MERGESORT_THRESHOLD = 12;
@@ -71,7 +70,7 @@ abstract class SorterTemplate {
             }
         }
     }
-    
+
     private void insertionSort(int lo, int hi) {
         for (int i = lo + 1 ; i <= hi; i++) {
             for (int j = i; j > lo; j--) {

@@ -22,12 +22,12 @@ import org.objectweb.asm.Type;
  * @version $Id: Constants.java,v 1.21 2006/03/05 02:43:19 herbyderby Exp $
  */
 public interface Constants extends org.objectweb.asm.Opcodes {
-    public static final Class[] EMPTY_CLASS_ARRAY = {};
+    public static final Class<?>[] EMPTY_CLASS_ARRAY = {};
     public static final Type[] TYPES_EMPTY = {};
 
     public static final Signature SIG_STATIC =
       TypeUtils.parseSignature("void <clinit>()");
-    
+
     public static final Type TYPE_OBJECT_ARRAY = TypeUtils.parseType("Object[]");
     public static final Type TYPE_CLASS_ARRAY = TypeUtils.parseType("Class[]");
     public static final Type TYPE_STRING_ARRAY = TypeUtils.parseType("String[]");
@@ -53,7 +53,7 @@ public interface Constants extends org.objectweb.asm.Opcodes {
     public static final Type TYPE_ERROR = TypeUtils.parseType("Error");
     public static final Type TYPE_SYSTEM = TypeUtils.parseType("System");
     public static final Type TYPE_SIGNATURE = TypeUtils.parseType("net.sf.cglib.core.Signature");
-    
+
     public static final String CONSTRUCTOR_NAME = "<init>";
     public static final String STATIC_NAME = "<clinit>";
     public static final String SOURCE_FILE = "<generated>";

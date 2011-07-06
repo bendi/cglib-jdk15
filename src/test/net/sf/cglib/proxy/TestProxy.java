@@ -44,18 +44,18 @@ public class TestProxy extends CodeGenTestCase {
      }
 
     public void testGetProxyClassAndConstructor() throws Exception {
-        HashMap map = new HashMap();
+        HashMap<String, String> map = new HashMap<String, String>();
         map.put("test", "test");
         InvocationHandler handler = new SimpleInvocationHandler(map);
-        Class proxyClass = Proxy.getProxyClass(TestProxy.class.getClassLoader(), new Class[] { Map.class });
+        Class<?> proxyClass = Proxy.getProxyClass(TestProxy.class.getClassLoader(), new Class[] { Map.class });
         Map proxyMap = (Map) proxyClass.getConstructor(new Class[] { InvocationHandler.class }).
             newInstance(new Object[] { handler });
-        assertEquals("proxy delegation not correct", 
+        assertEquals("proxy delegation not correct",
                             map.get("test"), proxyMap.get("test"));
     }
 
     public void testGetProxyInstance() throws Exception {
-        HashMap map = new HashMap();
+        HashMap<String, String> map = new HashMap<String, String>();
         map.put("test", "test");
         InvocationHandler handler = new SimpleInvocationHandler(map);
         Map proxyMap = (Map) Proxy.newProxyInstance(TestProxy.class.getClassLoader(), new Class[] { Map.class }, handler);
@@ -63,7 +63,7 @@ public class TestProxy extends CodeGenTestCase {
     }
 
     public void testIsProxyClass() throws Exception {
-        HashMap map = new HashMap();
+        HashMap<String, String> map = new HashMap<String, String>();
         map.put("test", "test");
         InvocationHandler handler = new SimpleInvocationHandler(map);
         Map proxyMap = (Map) Proxy.newProxyInstance(TestProxy.class.getClassLoader(), new Class[] { Map.class }, handler);
@@ -71,13 +71,14 @@ public class TestProxy extends CodeGenTestCase {
     }
 
     private class FakeProxy extends Proxy {
+    	private static final long serialVersionUID = -3396864428269221913L;
         public FakeProxy(InvocationHandler ih) {
             super(ih);
         }
     }
 
     public void testIsNotProxyClass() throws Exception {
-        assertTrue("fake proxy accepted as real", 
+        assertTrue("fake proxy accepted as real",
                         !Proxy.isProxyClass(FakeProxy.class));
     }
 
@@ -101,7 +102,7 @@ public class TestProxy extends CodeGenTestCase {
     }
 
     public void testGetInvocationHandler() throws Exception {
-        HashMap map = new HashMap();
+        HashMap<String, String> map = new HashMap<String, String>();
         map.put("test", "test");
         InvocationHandler handler = new InvocationHandler() {
             public Object invoke(Object o, Method method, Object[] args) throws Exception {
@@ -113,7 +114,7 @@ public class TestProxy extends CodeGenTestCase {
     }
 
     public void testException() throws Exception {
-        HashMap map = new HashMap();
+        HashMap<String, String> map = new HashMap<String, String>();
         map.put("test", "test");
         InvocationHandler handler = new InvocationHandler() {
             public Object invoke(Object o, Method method, Object[] args) throws Exception {
@@ -150,15 +151,15 @@ public class TestProxy extends CodeGenTestCase {
     public TestProxy(String testName) {
         super(testName);
     }
-    
+
     public static void main(String[] args) {
         junit.textui.TestRunner.run(suite());
     }
-    
+
     public static Test suite() {
         return new TestSuite(TestProxy.class);
     }
-    
+
     public void perform(ClassLoader loader) throws Throwable {
          InvocationHandler handler = new InvocationHandler() {
             public Object invoke(Object o, Method method, Object[] args) throws Exception {
@@ -166,13 +167,13 @@ public class TestProxy extends CodeGenTestCase {
             }
         };
         Proxy.newProxyInstance(loader, new Class[] { Map.class }, handler);
-       
+
     }
-    
+
     public void testFailOnMemoryLeak() throws Throwable {
         if(leaks()){
          fail("Memory Leak in Proxy");
         }
     }
-    
+
 }

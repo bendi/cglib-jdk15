@@ -15,9 +15,19 @@
  */
 package net.sf.cglib.reflect;
 
-import java.lang.reflect.*;
-import net.sf.cglib.*;
-import net.sf.cglib.core.*;
+import java.lang.reflect.Method;
+
+import net.sf.cglib.core.AbstractClassGenerator;
+import net.sf.cglib.core.ClassEmitter;
+import net.sf.cglib.core.CodeEmitter;
+import net.sf.cglib.core.Constants;
+import net.sf.cglib.core.EmitUtils;
+import net.sf.cglib.core.KeyFactory;
+import net.sf.cglib.core.MethodInfo;
+import net.sf.cglib.core.ReflectUtils;
+import net.sf.cglib.core.Signature;
+import net.sf.cglib.core.TypeUtils;
+
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.Type;
 
@@ -112,19 +122,19 @@ abstract public class MethodDelegate {
     protected String eqMethod;
 
     interface MethodDelegateKey {
-        Object newInstance(Class delegateClass, String methodName, Class iface);
+        Object newInstance(Class<?> delegateClass, String methodName, Class<?> iface);
     }
 
-    public static MethodDelegate createStatic(Class targetClass, String methodName, Class iface) {
-        Generator gen = new Generator();
+    public static <I,C> MethodDelegate createStatic(Class<C> targetClass, String methodName, Class<I> iface) {
+        Generator<I,C> gen = new Generator<I,C>();
         gen.setTargetClass(targetClass);
         gen.setMethodName(methodName);
         gen.setInterface(iface);
         return gen.create();
     }
 
-    public static MethodDelegate create(Object target, String methodName, Class iface) {
-        Generator gen = new Generator();
+    public static <I,C> MethodDelegate create(C target, String methodName, Class<I> iface) {
+        Generator<I,C> gen = new Generator<I,C>();
         gen.setTarget(target);
         gen.setMethodName(methodName);
         gen.setInterface(iface);
@@ -146,28 +156,29 @@ abstract public class MethodDelegate {
 
     abstract public MethodDelegate newInstance(Object target);
 
-    public static class Generator extends AbstractClassGenerator {
+    public static class Generator<I,C> extends AbstractClassGenerator<MethodDelegate> {
         private static final Source SOURCE = new Source(MethodDelegate.class.getName());
         private static final Type METHOD_DELEGATE =
           TypeUtils.parseType("net.sf.cglib.reflect.MethodDelegate");
         private static final Signature NEW_INSTANCE =
           new Signature("newInstance", METHOD_DELEGATE, new Type[]{ Constants.TYPE_OBJECT });
 
-        private Object target;
-        private Class targetClass;
+        private C target;
+        private Class<C> targetClass;
         private String methodName;
-        private Class iface;
+        private Class<I> iface;
 
         public Generator() {
             super(SOURCE);
         }
 
-        public void setTarget(Object target) {
+        @SuppressWarnings("unchecked")
+		public void setTarget(C target) {
             this.target = target;
-            this.targetClass = target.getClass();
+            this.targetClass = (Class<C>)target.getClass();
         }
 
-        public void setTargetClass(Class targetClass) {
+        public void setTargetClass(Class<C> targetClass) {
             this.targetClass = targetClass;
         }
 
@@ -175,7 +186,7 @@ abstract public class MethodDelegate {
             this.methodName = methodName;
         }
 
-        public void setInterface(Class iface) {
+        public void setInterface(Class<I> iface) {
             this.iface = iface;
         }
 
@@ -189,8 +200,9 @@ abstract public class MethodDelegate {
             return (MethodDelegate)super.create(key);
         }
 
-        protected Object firstInstance(Class type) {
-            return ((MethodDelegate)ReflectUtils.newInstance(type)).newInstance(target);
+        @Override
+        protected MethodDelegate firstInstance(Class<MethodDelegate> type) {
+            return ReflectUtils.newInstance(type).newInstance(target);
         }
 
         public void generateClass(ClassVisitor v) throws NoSuchMethodException {

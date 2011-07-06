@@ -15,7 +15,6 @@
  */
 package net.sf.cglib.core;
 
-import java.util.Set;
 
 /**
  * The default policy used by {@link AbstractClassGenerator}.
@@ -29,15 +28,15 @@ import java.util.Set;
  */
 public class DefaultNamingPolicy implements NamingPolicy {
     public static final DefaultNamingPolicy INSTANCE = new DefaultNamingPolicy();
-    
-    public String getClassName(String prefix, String source, Object key, Predicate names) {
+
+    public String getClassName(String prefix, String source, Object key, Predicate<String> names) {
         if (prefix == null) {
             prefix = "net.sf.cglib.empty.Object";
         } else if (prefix.startsWith("java")) {
             prefix = "$" + prefix;
         }
         String base =
-            prefix + "$$" + 
+            prefix + "$$" +
             source.substring(source.lastIndexOf('.') + 1) +
             getTag() + "$$" +
             Integer.toHexString(key.hashCode());

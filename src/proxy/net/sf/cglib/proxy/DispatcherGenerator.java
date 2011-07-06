@@ -40,9 +40,9 @@ class DispatcherGenerator implements CallbackGenerator {
         this.proxyRef = proxyRef;
     }
 
-    public void generate(ClassEmitter ce, Context context, List methods) {
-        for (Iterator it = methods.iterator(); it.hasNext();) {
-            MethodInfo method = (MethodInfo)it.next();
+    public void generate(ClassEmitter ce, Context context, List<MethodInfo> methods) {
+        for (Iterator<MethodInfo> it = methods.iterator(); it.hasNext();) {
+            MethodInfo method = it.next();
             if (!TypeUtils.isProtected(method.getModifiers())) {
                 CodeEmitter e = context.beginMethod(ce, method);
                 context.emitCallback(e, context.getIndex(method));
@@ -61,5 +61,5 @@ class DispatcherGenerator implements CallbackGenerator {
         }
     }
 
-    public void generateStatic(CodeEmitter e, Context context, List methods) { }
+    public void generateStatic(CodeEmitter e, Context context, List<MethodInfo> methods) { }
 }

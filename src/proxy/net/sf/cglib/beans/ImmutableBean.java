@@ -30,37 +30,38 @@ public class ImmutableBean
       TypeUtils.parseType("IllegalStateException");
     private static final Signature CSTRUCT_OBJECT =
       TypeUtils.parseConstructor("Object");
-    private static final Class[] OBJECT_CLASSES = { Object.class };
+    private static final Class<?>[] OBJECT_CLASSES = { Object.class };
     private static final String FIELD_NAME = "CGLIB$RWBean";
 
     private ImmutableBean() {
     }
 
-    public static Object create(Object bean) {
-        Generator gen = new Generator();
+    public static <T> T create(T bean) {
+        Generator<T> gen = new Generator<T>();
         gen.setBean(bean);
         return gen.create();
     }
 
-    public static class Generator extends AbstractClassGenerator {
+    public static class Generator<T> extends AbstractClassGenerator<T> {
         private static final Source SOURCE = new Source(ImmutableBean.class.getName());
-        private Object bean;
-        private Class target;
+        private T bean;
+        private Class<T> target;
 
         public Generator() {
             super(SOURCE);
         }
 
-        public void setBean(Object bean) {
+        @SuppressWarnings("unchecked")
+		public void setBean(T bean) {
             this.bean = bean;
-            target = bean.getClass();
+            target = (Class<T>)bean.getClass();
         }
 
         protected ClassLoader getDefaultClassLoader() {
             return target.getClassLoader();
         }
 
-        public Object create() {
+        public T create() {
             String name = target.getName();
             setNamePrefix(name);
             return super.create(name);
@@ -112,7 +113,8 @@ public class ImmutableBean
             ce.end_class();
         }
 
-        protected Object firstInstance(Class type) {
+        @Override
+        protected T firstInstance(Class<T> type) {
             return ReflectUtils.newInstance(type, OBJECT_CLASSES, new Object[]{ bean });
         }
     }

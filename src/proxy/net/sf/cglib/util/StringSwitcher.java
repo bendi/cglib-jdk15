@@ -65,7 +65,7 @@ abstract public class StringSwitcher {
      */
     abstract public int intValue(String s);
 
-    public static class Generator extends AbstractClassGenerator {
+    public static class Generator extends AbstractClassGenerator<StringSwitcher> {
         private static final Source SOURCE = new Source(StringSwitcher.class.getName());
 
         private String[] strings;
@@ -127,7 +127,7 @@ abstract public class StringSwitcher {
             EmitUtils.null_constructor(ce);
             final CodeEmitter e = ce.begin_method(Constants.ACC_PUBLIC, INT_VALUE, null);
             e.load_arg(0);
-            final List stringList = Arrays.asList(strings);
+            final List<String> stringList = Arrays.asList(strings);
             int style = fixedInput ? Constants.SWITCH_STYLE_HASHONLY : Constants.SWITCH_STYLE_HASH;
             EmitUtils.string_switch(e, strings, style, new ObjectSwitchCallback() {
                 public void processCase(Object key, Label end) {
@@ -143,8 +143,9 @@ abstract public class StringSwitcher {
             ce.end_class();
         }
 
-        protected Object firstInstance(Class type) {
-            return (StringSwitcher)ReflectUtils.newInstance(type);
+        @Override
+        protected StringSwitcher firstInstance(Class<StringSwitcher> type) {
+            return ReflectUtils.newInstance(type);
         }
     }
 }

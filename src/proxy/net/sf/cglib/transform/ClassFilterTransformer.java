@@ -15,7 +15,6 @@
  */
 package net.sf.cglib.transform;
 
-import org.objectweb.asm.*;
 
 public class ClassFilterTransformer extends AbstractClassFilterTransformer {
     private ClassFilter filter;

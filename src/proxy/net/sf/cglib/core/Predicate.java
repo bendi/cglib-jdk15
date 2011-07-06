@@ -15,7 +15,7 @@
  */
 package net.sf.cglib.core;
 
-public interface Predicate {
-    boolean evaluate(Object arg);
+public interface Predicate<T> {
+    boolean evaluate(T arg);
 }
 

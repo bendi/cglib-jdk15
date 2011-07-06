@@ -22,46 +22,47 @@ import java.lang.reflect.Method;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.Type;
 
-abstract public class FastClass
+abstract public class FastClass<T>
 {
-    private Class type;
+    private Class<T> type;
 
     protected FastClass() {
         throw new Error("Using the FastClass empty constructor--please report to the cglib-devel mailing list");
     }
 
-    protected FastClass(Class type) {
+    protected FastClass(Class<T> type) {
         this.type = type;
     }
 
-    public static FastClass create(Class type) {
+    public static <T> FastClass<T> create(Class<T> type) {
 
         return create(type.getClassLoader(),type);
 
     }
-    public static FastClass create(ClassLoader loader, Class type) {
-        Generator gen = new Generator();
+    public static <T> FastClass<T> create(ClassLoader loader, Class<T> type) {
+        Generator<T> gen = new Generator<T>();
         gen.setType(type);
         gen.setClassLoader(loader);
         return gen.create();
     }
 
-    public static class Generator extends AbstractClassGenerator
+    public static class Generator<T> extends AbstractClassGenerator<T>
     {
         private static final Source SOURCE = new Source(FastClass.class.getName());
-        private Class type;
+        private Class<T> type;
 
         public Generator() {
             super(SOURCE);
         }
 
-        public void setType(Class type) {
+        public void setType(Class<T> type) {
             this.type = type;
         }
 
-        public FastClass create() {
+        @SuppressWarnings("unchecked")
+		public FastClass<T> create() {
             setNamePrefix(type.getName());
-            return (FastClass)super.create(type.getName());
+            return (FastClass<T>)super.create(type.getName());
         }
 
         protected ClassLoader getDefaultClassLoader() {
@@ -72,7 +73,8 @@ abstract public class FastClass
             new FastClassEmitter(v, getClassName(), type);
         }
 
-        protected Object firstInstance(Class type) {
+        @Override
+        protected T firstInstance(Class<T> type) {
             return ReflectUtils.newInstance(type,
                                             new Class[]{ Class.class },
                                             new Object[]{ this.type });
@@ -80,27 +82,27 @@ abstract public class FastClass
 
     }
 
-    public Object invoke(String name, Class[] parameterTypes, Object obj, Object[] args) throws InvocationTargetException {
+    public Object invoke(String name, Class<?>[] parameterTypes, Object obj, Object[] args) throws InvocationTargetException {
         return invoke(getIndex(name, parameterTypes), obj, args);
     }
 
-    public Object newInstance() throws InvocationTargetException {
+    public T newInstance() throws InvocationTargetException {
         return newInstance(getIndex(Constants.EMPTY_CLASS_ARRAY), null);
     }
 
-    public Object newInstance(Class[] parameterTypes, Object[] args) throws InvocationTargetException {
+    public T newInstance(Class<?>[] parameterTypes, Object[] args) throws InvocationTargetException {
         return newInstance(getIndex(parameterTypes), args);
     }
 
-    public FastMethod getMethod(Method method) {
-        return new FastMethod(this, method);
+    public FastMethod<T> getMethod(Method method) {
+        return new FastMethod<T>(this, method);
     }
 
-    public FastConstructor getConstructor(Constructor constructor) {
-        return new FastConstructor(this, constructor);
+    public FastConstructor<T> getConstructor(Constructor<T> constructor) {
+        return new FastConstructor<T>(this, constructor);
     }
 
-    public FastMethod getMethod(String name, Class[] parameterTypes) {
+    public FastMethod<T> getMethod(String name, Class<?>[] parameterTypes) {
         try {
             return getMethod(type.getMethod(name, parameterTypes));
         } catch (NoSuchMethodException e) {
@@ -108,7 +110,7 @@ abstract public class FastClass
         }
     }
 
-    public FastConstructor getConstructor(Class[] parameterTypes) {
+    public FastConstructor<T> getConstructor(Class<?>[] parameterTypes) {
         try {
             return getConstructor(type.getConstructor(parameterTypes));
         } catch (NoSuchMethodException e) {
@@ -120,7 +122,7 @@ abstract public class FastClass
         return type.getName();
     }
 
-    public Class getJavaClass() {
+    public Class<T> getJavaClass() {
         return type;
     }
 
@@ -136,7 +138,7 @@ abstract public class FastClass
         if (o == null || !(o instanceof FastClass)) {
             return false;
         }
-        return type.equals(((FastClass)o).type);
+        return type.equals(((FastClass<?>)o).type);
     }
 
     /**
@@ -149,7 +151,7 @@ abstract public class FastClass
      * @param parameterTypes the parameter array
      * @return the index, or <code>-1</code> if none is found.
      */
-    abstract public int getIndex(String name, Class[] parameterTypes);
+    abstract public int getIndex(String name, Class<?>[] parameterTypes);
 
     /**
      * Return the index of the matching constructor. The index may be used
@@ -158,7 +160,7 @@ abstract public class FastClass
      * @param parameterTypes the parameter array
      * @return the constructor index, or <code>-1</code> if none is found.
      */
-    abstract public int getIndex(Class[] parameterTypes);
+    abstract public int getIndex(Class<?>[] parameterTypes);
 
     /**
      * Invoke the method with the specified index.
@@ -177,7 +179,7 @@ abstract public class FastClass
      * @param args the arguments passed to the constructor
      * @throws java.lang.reflect.InvocationTargetException if the constructor throws an exception
      */
-    abstract public Object newInstance(int index, Object[] args) throws InvocationTargetException;
+    abstract public T newInstance(int index, Object[] args) throws InvocationTargetException;
 
     abstract public int getIndex(Signature sig);
 
@@ -186,7 +188,7 @@ abstract public class FastClass
      */
     abstract public int getMaxIndex();
 
-    protected static String getSignatureWithoutReturnType(String name, Class[] parameterTypes) {
+    protected static String getSignatureWithoutReturnType(String name, Class<?>[] parameterTypes) {
         StringBuffer sb = new StringBuffer();
         sb.append(name);
         sb.append('(');

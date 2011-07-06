@@ -22,7 +22,7 @@ import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.Type;
 
-class BeanMapEmitter extends ClassEmitter {
+class BeanMapEmitter<T> extends ClassEmitter {
     private static final Type BEAN_MAP =
       TypeUtils.parseType("net.sf.cglib.beans.BeanMap");
     private static final Type FIXED_KEY_SET =
@@ -42,23 +42,23 @@ class BeanMapEmitter extends ClassEmitter {
     private static final Signature GET_PROPERTY_TYPE =
       TypeUtils.parseSignature("Class getPropertyType(String)");
 
-    public BeanMapEmitter(ClassVisitor v, String className, Class type, int require) {
+    public BeanMapEmitter(ClassVisitor v, String className, Class<T> type, int require) {
         super(v);
 
         begin_class(Constants.V1_2, Constants.ACC_PUBLIC, className, BEAN_MAP, null, Constants.SOURCE_FILE);
         EmitUtils.null_constructor(this);
         EmitUtils.factory_method(this, NEW_INSTANCE);
         generateConstructor();
-            
-        Map getters = makePropertyMap(ReflectUtils.getBeanGetters(type));
-        Map setters = makePropertyMap(ReflectUtils.getBeanSetters(type));
-        Map allProps = new HashMap();
+
+        Map<String, PropertyDescriptor> getters = makePropertyMap(ReflectUtils.getBeanGetters(type));
+        Map<String, PropertyDescriptor> setters = makePropertyMap(ReflectUtils.getBeanSetters(type));
+        Map<String, PropertyDescriptor> allProps = new HashMap<String, PropertyDescriptor>();
         allProps.putAll(getters);
         allProps.putAll(setters);
 
         if (require != 0) {
-            for (Iterator it = allProps.keySet().iterator(); it.hasNext();) {
-                String name = (String)it.next();
+            for (Iterator<String> it = allProps.keySet().iterator(); it.hasNext();) {
+                String name = it.next();
                 if ((((require & BeanMap.REQUIRE_GETTER) != 0) && !getters.containsKey(name)) ||
                     (((require & BeanMap.REQUIRE_SETTER) != 0) && !setters.containsKey(name))) {
                     it.remove();
@@ -76,15 +76,15 @@ class BeanMapEmitter extends ClassEmitter {
         end_class();
     }
 
-    private Map makePropertyMap(PropertyDescriptor[] props) {
-        Map names = new HashMap();
+    private Map<String, PropertyDescriptor> makePropertyMap(PropertyDescriptor[] props) {
+        Map<String, PropertyDescriptor> names = new HashMap<String, PropertyDescriptor>();
         for (int i = 0; i < props.length; i++) {
-            names.put(((PropertyDescriptor)props[i]).getName(), props[i]);
+            names.put(props[i].getName(), props[i]);
         }
         return names;
     }
 
-    private String[] getNames(Map propertyMap) {
+    private String[] getNames(Map<String, PropertyDescriptor> propertyMap) {
         return (String[])propertyMap.keySet().toArray(new String[propertyMap.size()]);
     }
 
@@ -96,8 +96,8 @@ class BeanMapEmitter extends ClassEmitter {
         e.return_value();
         e.end_method();
     }
-        
-    private void generateGet(Class type, final Map getters) {
+
+    private void generateGet(Class<T> type, final Map<String, PropertyDescriptor> getters) {
         final CodeEmitter e = begin_method(Constants.ACC_PUBLIC, BEAN_MAP_GET, null);
         e.load_arg(0);
         e.checkcast(Type.getType(type));
@@ -119,7 +119,7 @@ class BeanMapEmitter extends ClassEmitter {
         e.end_method();
     }
 
-    private void generatePut(Class type, final Map setters) {
+    private void generatePut(Class<T> type, final Map<String, PropertyDescriptor> setters) {
         final CodeEmitter e = begin_method(Constants.ACC_PUBLIC, BEAN_MAP_PUT, null);
         e.load_arg(0);
         e.checkcast(Type.getType(type));
@@ -151,7 +151,7 @@ class BeanMapEmitter extends ClassEmitter {
         e.return_value();
         e.end_method();
     }
-            
+
     private void generateKeySet(String[] allNames) {
         // static initializer
         declare_field(Constants.ACC_STATIC | Constants.ACC_PRIVATE, "keys", FIXED_KEY_SET, null);
@@ -173,7 +173,7 @@ class BeanMapEmitter extends ClassEmitter {
         e.end_method();
     }
 
-    private void generateGetPropertyType(final Map allProps, String[] allNames) {
+    private void generateGetPropertyType(final Map<String, PropertyDescriptor> allProps, String[] allNames) {
         final CodeEmitter e = begin_method(Constants.ACC_PUBLIC, GET_PROPERTY_TYPE, null);
         e.load_arg(0);
         EmitUtils.string_switch(e, allNames, Constants.SWITCH_STYLE_HASH, new ObjectSwitchCallback() {

@@ -15,14 +15,34 @@
  */
 package net.sf.cglib;
 
-import junit.framework.*;
-import net.sf.cglib.beans.*;
-import net.sf.cglib.core.*;
-import net.sf.cglib.proxy.*;
-import net.sf.cglib.reflect.*;
-import net.sf.cglib.transform.*;
-import net.sf.cglib.transform.impl.*;
-import net.sf.cglib.util.*;
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+import net.sf.cglib.beans.TestBeanCopier;
+import net.sf.cglib.beans.TestBeanGenerator;
+import net.sf.cglib.beans.TestBeanMap;
+import net.sf.cglib.beans.TestBulkBean;
+import net.sf.cglib.beans.TestImmutableBean;
+import net.sf.cglib.core.DebuggingClassWriter;
+import net.sf.cglib.core.TestKeyFactory;
+import net.sf.cglib.core.TestTinyBitSet;
+import net.sf.cglib.proxy.TestDispatcher;
+import net.sf.cglib.proxy.TestEnhancer;
+import net.sf.cglib.proxy.TestInterfaceMaker;
+import net.sf.cglib.proxy.TestLazyLoader;
+import net.sf.cglib.proxy.TestMixin;
+import net.sf.cglib.proxy.TestNoOp;
+import net.sf.cglib.proxy.TestProxy;
+import net.sf.cglib.proxy.TestProxyRefDispatcher;
+import net.sf.cglib.reflect.TestDelegates;
+import net.sf.cglib.reflect.TestFastClass;
+import net.sf.cglib.transform.impl.TestAddClassInit;
+import net.sf.cglib.transform.impl.TestAddDelegate;
+import net.sf.cglib.transform.impl.TestDemo;
+import net.sf.cglib.transform.impl.TestInterceptFields;
+import net.sf.cglib.transform.impl.TestProvideFields;
+import net.sf.cglib.transform.impl.TestTransformingLoader;
+import net.sf.cglib.util.TestParallelSorter;
 
 /**
  *@author     Gerhard Froehlich <a href="mailto:g-froehlich@gmx.de">
@@ -30,23 +50,23 @@ import net.sf.cglib.util.*;
  *@version    $Id: TestAll.java,v 1.66 2004/12/23 03:46:25 herbyderby Exp $
  */
 public class TestAll extends TestCase {
-    
-    public static String DEFAULT_DEBUG_LOACATION = System.getProperty("user.home") + 
+
+    public static String DEFAULT_DEBUG_LOACATION = System.getProperty("user.home") +
           System.getProperty("file.separator") + "cglib-debug";
-    
+
     public TestAll(String testName) {
         super(testName);
     }
 
     public static Test suite() throws Exception{
-       
-      
-        
+
+
+
         System.getProperties().list(System.out);
         TestSuite suite = new TestSuite();
 
         //security
-        
+
         // proxy
         suite.addTest(TestEnhancer.suite());
         suite.addTest(TestProxy.suite());
@@ -63,7 +83,7 @@ public class TestAll extends TestCase {
         suite.addTest(TestImmutableBean.suite());
         suite.addTest(TestBeanCopier.suite());
         suite.addTest(TestBeanGenerator.suite());
-        
+
         // reflect
         suite.addTest(TestDelegates.suite());
         suite.addTest(TestFastClass.suite());
@@ -71,7 +91,7 @@ public class TestAll extends TestCase {
         // core
         suite.addTest(TestKeyFactory.suite());
         suite.addTest(TestTinyBitSet.suite());
-        
+
         // util
         suite.addTest(TestParallelSorter.suite());
 
@@ -90,16 +110,16 @@ public class TestAll extends TestCase {
     }
 
     public static void main(String args[])throws Exception {
-        
-       
+
+
         if(System.getProperty(DebuggingClassWriter.DEBUG_LOCATION_PROPERTY) ==  null){
          System.setProperty(DebuggingClassWriter.DEBUG_LOCATION_PROPERTY,DEFAULT_DEBUG_LOACATION);
         }
         String[] testCaseName = {TestAll.class.getName()};
         junit.textui.TestRunner.main(testCaseName);
-        
-     
-       
+
+
+
     }
 }
 

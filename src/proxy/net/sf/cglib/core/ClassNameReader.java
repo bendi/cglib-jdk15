@@ -25,16 +25,16 @@ public class ClassNameReader {
     }
 
     private static final EarlyExitException EARLY_EXIT = new EarlyExitException();
-    private static class EarlyExitException extends RuntimeException { }
-    
+    private static class EarlyExitException extends RuntimeException {	private static final long serialVersionUID = -3396864428269221913L; }
+
     public static String getClassName(ClassReader r) {
-    
+
         return getClassInfo(r)[0];
-      
+
     }
-    
+
     public static String[] getClassInfo(ClassReader r) {
-        final List array = new ArrayList();
+        final List<String> array = new ArrayList<String>();
         try {
             r.accept(new ClassAdapter(null) {
                 public void visit(int version,
@@ -50,12 +50,12 @@ public class ClassNameReader {
                     for(int i = 0; i < interfaces.length; i++  ){
                        array.add( interfaces[i].replace('/', '.') );
                     }
-                    
+
                     throw EARLY_EXIT;
                 }
             }, ClassReader.SKIP_DEBUG | ClassReader.SKIP_FRAMES);
         } catch (EarlyExitException e) { }
-        
+
         return (String[])array.toArray( new String[]{} );
     }
 }

@@ -21,14 +21,14 @@ import net.sf.cglib.core.TypeUtils;
 import org.objectweb.asm.Type;
 
 public class ExampleTask extends AbstractTransformTask {
-    private List properties = new ArrayList();
+    private List<NewProperty> properties = new ArrayList<NewProperty>();
     private String fieldSuffix = "";
     private ClassTransformer transformer;
 
     protected ClassTransformer getClassTransformer(String name[]) {
         return transformer;
     }
-    
+
     protected void beforeExecute() {
         ClassTransformer t1 = new AccessFieldTransformer(new AccessFieldTransformer.Callback() {
             public String getPropertyName(Type owner, String fieldName) {

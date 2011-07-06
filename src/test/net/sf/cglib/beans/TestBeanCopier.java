@@ -15,9 +15,10 @@
  */
 package net.sf.cglib.beans;
 
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 import net.sf.cglib.core.Converter;
-import java.lang.reflect.Method;
-import junit.framework.*;
 
 /**
  *
@@ -40,7 +41,7 @@ public class TestBeanCopier extends TestCase {
         bean1.setIntP(42);
         MA bean2 = new MA();
         copier.copy(bean1, bean2, new Converter() {
-            public Object convert(Object value, Class target, Object context) {
+            public Object convert(Object value, Class<?> target, Object context) {
                 if (target.equals(Integer.TYPE)) {
                     return new Integer(((Number)value).intValue() + 1);
                 }
@@ -49,15 +50,15 @@ public class TestBeanCopier extends TestCase {
         });
         assertTrue(bean2.getIntP() == 43);
     }
-    
+
     public TestBeanCopier(java.lang.String testName) {
         super(testName);
     }
-    
+
     public static void main(java.lang.String[] args) {
         junit.textui.TestRunner.run(suite());
     }
-    
+
     public static Test suite() {
         return new TestSuite(TestBeanCopier.class);
     }

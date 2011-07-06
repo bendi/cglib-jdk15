@@ -24,22 +24,22 @@ package net.sf.cglib.proxy;
  * @author Juozas Baliuka <a href="mailto:baliuka@mwm.lt">baliuka@mwm.lt</a>
  * @version $Id: Factory.java,v 1.13 2004/06/24 21:15:20 herbyderby Exp $
  */
-public interface Factory {
+public interface Factory<T> {
     /**
      * Creates new instance of the same type, using the no-arg constructor.
      * The class of this object must have been created using a single Callback type.
      * If multiple callbacks are required an exception will be thrown.
      * @param callback the new interceptor to use
      * @return new instance of the same type
-     */     
-    Object newInstance(Callback callback);
-    
+     */
+    T newInstance(Callback callback);
+
     /**
      * Creates new instance of the same type, using the no-arg constructor.
      * @param callbacks the new callbacks(s) to use
      * @return new instance of the same type
-     */     
-    Object newInstance(Callback[] callbacks);
+     */
+    T newInstance(Callback[] callbacks);
 
     /**
      * Creates a new instance of the same type, using the constructor
@@ -49,7 +49,7 @@ public interface Factory {
      * @param callbacks the new interceptor(s) to use
      * @return new instance of the same type
      */
-    Object newInstance(Class[] types, Object[] args, Callback[] callbacks);
+    T newInstance(Class<?>[] types, Object[] args, Callback[] callbacks);
 
     /**
      * Return the <code>Callback</code> implementation at the specified index.
@@ -74,6 +74,6 @@ public interface Factory {
     /**
      * Get the current set of callbacks for ths object.
      * @return a new array instance
-     */     
+     */
     Callback[] getCallbacks();
 }

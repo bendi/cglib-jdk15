@@ -42,34 +42,34 @@ abstract public class BeanCopier
         public Object newInstance(String source, String target, boolean useConverter);
     }
 
-    public static BeanCopier create(Class source, Class target, boolean useConverter) {
-        Generator gen = new Generator();
+    public static <S, T> BeanCopier create(Class<S> source, Class<T> target, boolean useConverter) {
+        Generator<S, T> gen = new Generator<S, T>();
         gen.setSource(source);
         gen.setTarget(target);
         gen.setUseConverter(useConverter);
         return gen.create();
     }
 
-    abstract public void copy(Object from, Object to, Converter converter);
+    abstract public <S, T> void copy(S from, T to, Converter converter);
 
-    public static class Generator extends AbstractClassGenerator {
+    public static class Generator<S, T> extends AbstractClassGenerator<BeanCopier> {
         private static final Source SOURCE = new Source(BeanCopier.class.getName());
-        private Class source;
-        private Class target;
+        private Class<S> source;
+        private Class<T> target;
         private boolean useConverter;
 
         public Generator() {
             super(SOURCE);
         }
 
-        public void setSource(Class source) {
+        public void setSource(Class<S> source) {
             if(!Modifier.isPublic(source.getModifiers())){
                setNamePrefix(source.getName());
             }
             this.source = source;
         }
 
-        public void setTarget(Class target) {
+        public void setTarget(Class<T> target) {
             if(!Modifier.isPublic(target.getModifiers())){
                setNamePrefix(target.getName());
             }
@@ -87,7 +87,7 @@ abstract public class BeanCopier
 
         public BeanCopier create() {
             Object key = KEY_FACTORY.newInstance(source.getName(), target.getName(), useConverter);
-            return (BeanCopier)super.create(key);
+            return super.create(key);
         }
 
         public void generateClass(ClassVisitor v) {
@@ -106,7 +106,7 @@ abstract public class BeanCopier
             PropertyDescriptor[] getters = ReflectUtils.getBeanGetters(source);
             PropertyDescriptor[] setters = ReflectUtils.getBeanGetters(target);
 
-            Map names = new HashMap();
+            Map<String, PropertyDescriptor> names = new HashMap<String, PropertyDescriptor>();
             for (int i = 0; i < getters.length; i++) {
                 names.put(getters[i].getName(), getters[i]);
             }
@@ -160,7 +160,8 @@ abstract public class BeanCopier
             return setter.getPropertyType().isAssignableFrom(getter.getPropertyType());
         }
 
-        protected Object firstInstance(Class type) {
+        @Override
+        protected BeanCopier firstInstance(Class<BeanCopier> type) {
             return ReflectUtils.newInstance(type);
         }
     }

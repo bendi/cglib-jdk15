@@ -100,25 +100,25 @@ abstract public class KeyFactory {
     protected KeyFactory() {
     }
 
-    public static KeyFactory create(Class keyInterface) {
+    public static <T> T create(Class<T> keyInterface) {
         return create(keyInterface, null);
     }
 
-    public static KeyFactory create(Class keyInterface, Customizer customizer) {
+    public static <T> T create(Class<T> keyInterface, Customizer customizer) {
         return create(keyInterface.getClassLoader(), keyInterface,  customizer);
     }
 
-    public static KeyFactory create(ClassLoader loader, Class keyInterface, Customizer customizer) {
-        Generator gen = new Generator();
+    public static <T> T create(ClassLoader loader, Class<T> keyInterface, Customizer customizer) {
+        Generator<T> gen = new Generator<T>();
         gen.setInterface(keyInterface);
         gen.setCustomizer(customizer);
         gen.setClassLoader(loader);
         return gen.create();
     }
 
-    public static class Generator extends AbstractClassGenerator {
+    public static class Generator<T> extends AbstractClassGenerator<T> {
         private static final Source SOURCE = new Source(KeyFactory.class.getName());
-        private Class keyInterface;
+        private Class<T> keyInterface;
         private Customizer customizer;
         private int constant;
         private int multiplier;
@@ -135,13 +135,13 @@ abstract public class KeyFactory {
             this.customizer = customizer;
         }
 
-        public void setInterface(Class keyInterface) {
+        public void setInterface(Class<T> keyInterface) {
             this.keyInterface = keyInterface;
         }
 
-        public KeyFactory create() {
+        public T create() {
             setNamePrefix(keyInterface.getName());
-            return (KeyFactory)super.create(keyInterface.getName());
+            return super.create(keyInterface.getName());
         }
 
         public void setHashConstant(int constant) {
@@ -152,7 +152,8 @@ abstract public class KeyFactory {
             this.multiplier = multiplier;
         }
 
-        protected Object firstInstance(Class type) {
+        @Override
+        protected T firstInstance(Class<T> type) {
             return ReflectUtils.newInstance(type);
         }
 
@@ -212,7 +213,7 @@ abstract public class KeyFactory {
             Label fail = e.make_label();
             e.load_arg(0);
             e.instance_of_this();
-            e.if_jump(e.EQ, fail);
+            e.if_jump(CodeEmitter.EQ, fail);
             for (int i = 0; i < parameterTypes.length; i++) {
                 e.load_this();
                 e.getfield(getFieldName(i));

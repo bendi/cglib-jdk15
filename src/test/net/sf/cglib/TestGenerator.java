@@ -18,7 +18,7 @@ package net.sf.cglib;
 import net.sf.cglib.core.AbstractClassGenerator;
 import net.sf.cglib.core.ReflectUtils;
 
-abstract public class TestGenerator extends AbstractClassGenerator {
+abstract public class TestGenerator extends AbstractClassGenerator<Integer> {
     private static int counter;
 
     public TestGenerator(Source source) {
@@ -29,8 +29,12 @@ abstract public class TestGenerator extends AbstractClassGenerator {
         return null;
     }
 
-    protected Object firstInstance(Class type) throws Exception {
+    protected Integer firstInstance(Class<Integer> type) throws Exception {
         return ReflectUtils.newInstance(type);
+    }
+
+    protected Object nextInstance(Object instance) throws Exception {
+        return instance;
     }
 
     public Object create() {

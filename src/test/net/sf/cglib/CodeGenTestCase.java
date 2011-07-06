@@ -41,22 +41,22 @@ abstract public class CodeGenTestCase extends TestCase {
     public CodeGenTestCase(String testName) {
         super(testName);
     }
-    
+
     public   abstract void perform(ClassLoader loader)throws Throwable;
-    
-    
+
+
     public boolean leaks()throws Throwable{
-        
-        List classPath = new ArrayList();
-        
+
+        List<URL> classPath = new ArrayList<URL>();
+
         for( StringTokenizer tokenizer = new StringTokenizer(System.getProperty("java.class.path"),File.pathSeparator); tokenizer.hasMoreElements();  ){
-            
+
             classPath.add( new File(tokenizer.nextToken()).toURL() );
-            
+
         }
-        
-        
-        final Set coreClasses = new HashSet();
+
+
+        final Set<String> coreClasses = new HashSet<String>();
         coreClasses.add(Factory.class.getName());
         coreClasses.add(Callback.class.getName());
         coreClasses.add(MethodInterceptor.class.getName());
@@ -65,32 +65,32 @@ abstract public class CodeGenTestCase extends TestCase {
         coreClasses.add(FastClass.class.getName());
         coreClasses.add(FastClass.Generator.class.getName());
         coreClasses.add(Signature.class.getName());
-        
-        
-        
-        
-        
-        
+
+
+
+
+
+
         URLClassLoader loader = new URLClassLoader((URL[]) classPath.toArray(new URL[classPath.size()])){
-            
-            public Class loadClass(String name) throws ClassNotFoundException {
-                
+
+            public Class<?> loadClass(String name) throws ClassNotFoundException {
+
                 String res = name.replace('.','/') + ".class";
-                
+
                 if(name.startsWith("java") || name.startsWith("org.objectweb.asm") || name.startsWith("sun.")){
                     return super.loadClass(name);
                 }
-                
-                
-                
+
+
+
                 if( coreClasses.contains(name) ){
                     return super.loadClass(name);
                 }
-                
-                
+
+
                 try{
-                    
-                    
+
+
                     InputStream is = getResourceAsStream(res);
                     ByteArrayOutputStream bout = new ByteArrayOutputStream();
                     try{
@@ -98,9 +98,9 @@ abstract public class CodeGenTestCase extends TestCase {
                         while( (b = is.read()) != -1 ){
                             bout.write((byte)b);
                         }
-                        
+
                     }finally{
-                        is.close();     
+                        is.close();
                     }
                     byte data [] = bout.toByteArray();
                     return defineClass(name,data,0,data.length );
@@ -108,39 +108,39 @@ abstract public class CodeGenTestCase extends TestCase {
                     throw new ClassNotFoundException( name + ":" + e.toString());
                 }
             }
-            
+
         };
-        
+
         perform(loader);
-        
-        java.lang.ref.Reference ref = new java.lang.ref.WeakReference(loader);
-        
+
+        java.lang.ref.Reference<URLClassLoader> ref = new java.lang.ref.WeakReference<URLClassLoader>(loader);
+
         loader = null;
-        java.util.List list = new  java.util.ArrayList();
-        
+        java.util.List<byte[]> list = new  java.util.ArrayList<byte[]>();
+
         for(int i = 0; i < 512; i++  ){
-            
+
             System.gc();
             System.gc();
-            
+
             if(ref.get() == null ){
-             
+
                 return false;
-                
+
             }
-            
+
           byte[] garbage  =  new byte[ (i + 1)*1004 ];
-          list.add(garbage);  
-        
-          
+          list.add(garbage);
+
+
         }
-        
+
         return true;
-        
-        
+
+
     }
-    
-    
-    
+
+
+
 }
 

@@ -15,9 +15,24 @@
  */
 package net.sf.cglib.proxy;
 
-import java.lang.reflect.Method;
-import java.util.*;
-import net.sf.cglib.core.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import net.sf.cglib.core.ClassEmitter;
+import net.sf.cglib.core.ClassInfo;
+import net.sf.cglib.core.CodeEmitter;
+import net.sf.cglib.core.CollectionUtils;
+import net.sf.cglib.core.Constants;
+import net.sf.cglib.core.EmitUtils;
+import net.sf.cglib.core.Local;
+import net.sf.cglib.core.MethodInfo;
+import net.sf.cglib.core.ObjectSwitchCallback;
+import net.sf.cglib.core.Signature;
+import net.sf.cglib.core.Transformer;
+import net.sf.cglib.core.TypeUtils;
+
 import org.objectweb.asm.Label;
 import org.objectweb.asm.Type;
 
@@ -28,7 +43,7 @@ implements CallbackGenerator
 
     static final String EMPTY_ARGS_NAME = "CGLIB$emptyArgs";
     static final String FIND_PROXY_NAME = "CGLIB$findMethodProxy";
-    static final Class[] FIND_PROXY_TYPES = { Signature.class };
+    static final Class<?>[] FIND_PROXY_TYPES = { Signature.class };
 
     private static final Type ABSTRACT_METHOD_ERROR =
       TypeUtils.parseType("AbstractMethodError");
@@ -42,8 +57,6 @@ implements CallbackGenerator
       TypeUtils.parseType("net.sf.cglib.proxy.MethodInterceptor");
     private static final Signature GET_DECLARED_METHODS =
       TypeUtils.parseSignature("java.lang.reflect.Method[] getDeclaredMethods()");
-    private static final Signature GET_DECLARING_CLASS =
-      TypeUtils.parseSignature("Class getDeclaringClass()");
     private static final Signature FIND_METHODS =
       TypeUtils.parseSignature("java.lang.reflect.Method[] findMethods(String[], java.lang.reflect.Method[])");
     private static final Signature MAKE_PROXY =
@@ -65,13 +78,11 @@ implements CallbackGenerator
       new Signature(FIND_PROXY_NAME, METHOD_PROXY, new Type[]{ Constants.TYPE_SIGNATURE });
     private static final Signature TO_STRING =
       TypeUtils.parseSignature("String toString()");
-    private static final Transformer METHOD_TO_CLASS = new Transformer(){
-        public Object transform(Object value) {
+    private static final Transformer<MethodInfo, ClassInfo> METHOD_TO_CLASS = new Transformer<MethodInfo, ClassInfo>(){
+        public ClassInfo transform(MethodInfo value) {
             return ((MethodInfo)value).getClassInfo();
         }
     };
-    private static final Signature CSTRUCT_SIGNATURE =
-        TypeUtils.parseConstructor("String, String");
 
     private String getMethodField(Signature impl) {
         return impl.getName() + "$Method";
@@ -80,9 +91,9 @@ implements CallbackGenerator
         return impl.getName() + "$Proxy";
     }
 
-    public void generate(ClassEmitter ce, Context context, List methods) {
-        Map sigMap = new HashMap();
-        for (Iterator it = methods.iterator(); it.hasNext();) {
+    public void generate(ClassEmitter ce, Context context, List<MethodInfo> methods) {
+        Map<String, String> sigMap = new HashMap<String, String>();
+        for (Iterator<MethodInfo> it = methods.iterator(); it.hasNext();) {
             MethodInfo method = (MethodInfo)it.next();
             Signature sig = method.getSignature();
             Signature impl = context.getImplSignature(method);
@@ -113,13 +124,13 @@ implements CallbackGenerator
 
             e.load_this();
             e.getfield(methodField);
-            
+
             if (sig.getArgumentTypes().length == 0) {
                 e.getfield(EMPTY_ARGS_NAME);
             } else {
                 e.create_arg_array();
             }
-            
+
             e.getfield(methodProxyField);
             e.invoke_interface(METHOD_INTERCEPTOR, INTERCEPT);
             e.unbox_or_zero(sig.getReturnType());
@@ -144,7 +155,7 @@ implements CallbackGenerator
         }
     }
 
-    public void generateStatic(CodeEmitter e, Context context, List methods) throws Exception {
+    public void generateStatic(CodeEmitter e, Context context, List<MethodInfo> methods) throws Exception {
         /* generates:
            static {
              Class thisClass = Class.forName("NameOfThisClass");
@@ -166,12 +177,12 @@ implements CallbackGenerator
         Local declaringclass = e.make_local();
         EmitUtils.load_class_this(e);
         e.store_local(thisclass);
-        
-        Map methodsByClass = CollectionUtils.bucket(methods, METHOD_TO_CLASS);
-        for (Iterator i = methodsByClass.keySet().iterator(); i.hasNext();) {
+
+        Map<ClassInfo,List<MethodInfo>> methodsByClass = CollectionUtils.bucket(methods, METHOD_TO_CLASS);
+        for (Iterator<ClassInfo> i = methodsByClass.keySet().iterator(); i.hasNext();) {
             ClassInfo classInfo = (ClassInfo)i.next();
 
-            List classMethods = (List)methodsByClass.get(classInfo);
+            List<MethodInfo> classMethods = methodsByClass.get(classInfo);
             e.push(2 * classMethods.size());
             e.newarray(Constants.TYPE_STRING);
             for (int index = 0; index < classMethods.size(); index++) {
@@ -186,7 +197,7 @@ implements CallbackGenerator
                 e.push(sig.getDescriptor());
                 e.aastore();
             }
-            
+
             EmitUtils.load_class(e, classInfo.getType());
             e.dup();
             e.store_local(declaringclass);
@@ -214,7 +225,7 @@ implements CallbackGenerator
         }
     }
 
-    public void generateFindProxy(ClassEmitter ce, final Map sigMap) {
+    public void generateFindProxy(ClassEmitter ce, final Map<String, String> sigMap) {
         final CodeEmitter e = ce.begin_method(Constants.ACC_PUBLIC | Constants.ACC_STATIC,
                                               FIND_PROXY,
                                               null);

@@ -18,16 +18,16 @@ package net.sf.cglib.reflect;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-public class FastMethod extends FastMember
+public class FastMethod<T> extends FastMember<Method, T>
 {
-    FastMethod(FastClass fc, Method method) {
+    FastMethod(FastClass<T> fc, Method method) {
         super(fc, method, helper(fc, method));
     }
 
-    private static int helper(FastClass fc, Method method) {
+    private static int helper(FastClass<?> fc, Method method) {
         int index = fc.getIndex(method.getName(), method.getParameterTypes());
         if (index < 0) {
-            Class[] types = method.getParameterTypes();
+            Class<?>[] types = method.getParameterTypes();
             System.err.println("hash=" + method.getName().hashCode() + " size=" + types.length);
             for (int i = 0; i < types.length; i++) {
                 System.err.println("  types[" + i + "]=" + types[i].getName());
@@ -37,16 +37,18 @@ public class FastMethod extends FastMember
         return index;
     }
 
-    public Class getReturnType() {
-        return ((Method)member).getReturnType();
+    public Class<?> getReturnType() {
+        return member.getReturnType();
     }
 
-    public Class[] getParameterTypes() {
-        return ((Method)member).getParameterTypes();
+    @Override
+    public Class<?>[] getParameterTypes() {
+        return member.getParameterTypes();
     }
 
-    public Class[] getExceptionTypes() {
-        return ((Method)member).getExceptionTypes();
+    @Override
+    public Class<?>[] getExceptionTypes() {
+        return member.getExceptionTypes();
     }
 
     public Object invoke(Object obj, Object[] args) throws InvocationTargetException {
@@ -54,6 +56,6 @@ public class FastMethod extends FastMember
     }
 
     public Method getJavaMethod() {
-        return (Method)member;
+        return member;
     }
 }

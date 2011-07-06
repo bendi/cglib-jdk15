@@ -21,7 +21,7 @@ import net.sf.cglib.core.*;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.Type;
-    
+
 class FastClassEmitter extends ClassEmitter {
     private static final Signature CSTRUCT_CLASS =
       TypeUtils.parseConstructor("Class");
@@ -48,8 +48,8 @@ class FastClassEmitter extends ClassEmitter {
     private static final Type INVOCATION_TARGET_EXCEPTION =
       TypeUtils.parseType("java.lang.reflect.InvocationTargetException");
     private static final Type[] INVOCATION_TARGET_EXCEPTION_ARRAY = { INVOCATION_TARGET_EXCEPTION };
-    
-    public FastClassEmitter(ClassVisitor v, String className, Class type) {
+
+    public FastClassEmitter(ClassVisitor v, String className, Class<?> type) {
         super(v);
 
         Type base = Type.getType(type);
@@ -64,22 +64,23 @@ class FastClassEmitter extends ClassEmitter {
         e.end_method();
 
         VisibilityPredicate vp = new VisibilityPredicate(type, false);
-        List methods = ReflectUtils.addAllMethods(type, new ArrayList());
+        List<Method> methods = ReflectUtils.addAllMethods(type, new ArrayList<Method>());
         CollectionUtils.filter(methods, vp);
         CollectionUtils.filter(methods, new DuplicatesPredicate());
-        List constructors = new ArrayList(Arrays.asList(type.getDeclaredConstructors()));
+        @SuppressWarnings("rawtypes")
+		List<Constructor> constructors = new ArrayList<Constructor>(Arrays.asList(type.getDeclaredConstructors()));
         CollectionUtils.filter(constructors, vp);
-        
+
         // getIndex(String)
         emitIndexBySignature(methods);
 
         // getIndex(String, Class[])
         emitIndexByClassArray(methods);
-        
+
         // getIndex(Class[])
         e = begin_method(Constants.ACC_PUBLIC, CONSTRUCTOR_GET_INDEX, null);
         e.load_args();
-        List info = CollectionUtils.transform(constructors, MethodInfoTransformer.getInstance());
+        List<MethodInfo> info = CollectionUtils.transform(constructors, MethodInfoTransformer.getInstance());
         EmitUtils.constructor_switch(e, info, new GetIndexCallback(e, info));
         e.end_method();
 
@@ -109,11 +110,11 @@ class FastClassEmitter extends ClassEmitter {
     }
 
     // TODO: support constructor indices ("<init>")
-    private void emitIndexBySignature(List methods) {
+    private void emitIndexBySignature(List<Method> methods) {
         CodeEmitter e = begin_method(Constants.ACC_PUBLIC, SIGNATURE_GET_INDEX, null);
-        List signatures = CollectionUtils.transform(methods, new Transformer() {
-            public Object transform(Object obj) {
-                return ReflectUtils.getSignature((Method)obj).toString();
+        List<String> signatures = CollectionUtils.transform(methods, new Transformer<Method,String>() {
+            public String transform(Method obj) {
+                return ReflectUtils.getSignature(obj).toString();
             }
         });
         e.load_arg(0);
@@ -123,13 +124,13 @@ class FastClassEmitter extends ClassEmitter {
     }
 
     private static final int TOO_MANY_METHODS = 100; // TODO
-    private void emitIndexByClassArray(List methods) {
+    private void emitIndexByClassArray(List<Method> methods) {
         CodeEmitter e = begin_method(Constants.ACC_PUBLIC, METHOD_GET_INDEX, null);
         if (methods.size() > TOO_MANY_METHODS) {
             // hack for big classes
-            List signatures = CollectionUtils.transform(methods, new Transformer() {
-                public Object transform(Object obj) {
-                    String s = ReflectUtils.getSignature((Method)obj).toString();
+            List<String> signatures = CollectionUtils.transform(methods, new Transformer<Method,String>() {
+                public String transform(Method obj) {
+                    String s = ReflectUtils.getSignature(obj).toString();
                     return s.substring(0, s.lastIndexOf(')') + 1);
                 }
             });
@@ -138,13 +139,13 @@ class FastClassEmitter extends ClassEmitter {
             signatureSwitchHelper(e, signatures);
         } else {
             e.load_args();
-            List info = CollectionUtils.transform(methods, MethodInfoTransformer.getInstance());
+            List<MethodInfo> info = CollectionUtils.transform(methods, MethodInfoTransformer.getInstance());
             EmitUtils.method_switch(e, info, new GetIndexCallback(e, info));
         }
         e.end_method();
     }
 
-    private void signatureSwitchHelper(final CodeEmitter e, final List signatures) {
+    private void signatureSwitchHelper(final CodeEmitter e, final List<String> signatures) {
         ObjectSwitchCallback callback = new ObjectSwitchCallback() {
             public void processCase(Object key, Label end) {
                 // TODO: remove linear indexOf
@@ -162,8 +163,8 @@ class FastClassEmitter extends ClassEmitter {
                                 callback);
     }
 
-    private static void invokeSwitchHelper(final CodeEmitter e, List members, final int arg, final Type base) {
-        final List info = CollectionUtils.transform(members, MethodInfoTransformer.getInstance());        
+    private static void invokeSwitchHelper(final CodeEmitter e, List<? extends AccessibleObject> members, final int arg, final Type base) {
+        final List<MethodInfo> info = CollectionUtils.transform(members, MethodInfoTransformer.getInstance());
         final Label illegalArg = e.make_label();
         Block block = e.begin_block();
         e.process_switch(getIntRange(info.size()), new ProcessSwitchCallback() {
@@ -195,27 +196,27 @@ class FastClassEmitter extends ClassEmitter {
 
     private static class GetIndexCallback implements ObjectSwitchCallback {
         private CodeEmitter e;
-        private Map indexes = new HashMap();
+        private Map<MethodInfo, Integer> indexes = new HashMap<MethodInfo, Integer>();
 
-        public GetIndexCallback(CodeEmitter e, List methods) {
+        public GetIndexCallback(CodeEmitter e, List<MethodInfo> methods) {
             this.e = e;
             int index = 0;
-            for (Iterator it = methods.iterator(); it.hasNext();) {
+            for (Iterator<MethodInfo> it = methods.iterator(); it.hasNext();) {
                 indexes.put(it.next(), new Integer(index++));
             }
         }
-            
+
         public void processCase(Object key, Label end) {
             e.push(((Integer)indexes.get(key)).intValue());
             e.return_value();
         }
-        
+
         public void processDefault() {
             e.push(-1);
             e.return_value();
         }
     }
-    
+
     private static int[] getIntRange(int length) {
         int[] range = new int[length];
         for (int i = 0; i < length; i++) {

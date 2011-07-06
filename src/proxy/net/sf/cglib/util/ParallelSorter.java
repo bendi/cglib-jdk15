@@ -15,9 +15,12 @@
  */
 package net.sf.cglib.util;
 
-import java.lang.reflect.*;
 import java.util.Comparator;
-import net.sf.cglib.core.*;
+
+import net.sf.cglib.core.AbstractClassGenerator;
+import net.sf.cglib.core.ClassesKey;
+import net.sf.cglib.core.ReflectUtils;
+
 import org.objectweb.asm.ClassVisitor;
 
 /**
@@ -95,7 +98,7 @@ abstract public class ParallelSorter extends SorterTemplate {
      * @param index array (column) to sort by
      * @param cmp Comparator to use if the specified column is non-primitive
      */
-    public void quickSort(int index, Comparator cmp) {
+    public void quickSort(int index, Comparator<Object> cmp) {
         quickSort(index, 0, len(), cmp);
     }
 
@@ -106,7 +109,7 @@ abstract public class ParallelSorter extends SorterTemplate {
      * @param hi ending array index (row), exclusive
      * @param cmp Comparator to use if the specified column is non-primitive
      */
-    public void quickSort(int index, int lo, int hi, Comparator cmp) {
+    public void quickSort(int index, int lo, int hi, Comparator<Object> cmp) {
         chooseComparer(index, cmp);
         super.quickSort(lo, hi - 1);
     }
@@ -134,7 +137,7 @@ abstract public class ParallelSorter extends SorterTemplate {
      * @param lo starting array index (row), inclusive
      * @param hi ending array index (row), exclusive
      */
-    public void mergeSort(int index, Comparator cmp) {
+    public void mergeSort(int index, Comparator<Object> cmp) {
         mergeSort(index, 0, len(), cmp);
     }
 
@@ -145,14 +148,14 @@ abstract public class ParallelSorter extends SorterTemplate {
      * @param hi ending array index (row), exclusive
      * @param cmp Comparator to use if the specified column is non-primitive
      */
-    public void mergeSort(int index, int lo, int hi, Comparator cmp) {
+    public void mergeSort(int index, int lo, int hi, Comparator<Object> cmp) {
         chooseComparer(index, cmp);
         super.mergeSort(lo, hi - 1);
     }
 
-    private void chooseComparer(int index, Comparator cmp) {
+    private void chooseComparer(int index, Comparator<Object> cmp) {
         Object array = a[index];
-        Class type = array.getClass().getComponentType();
+        Class<?> type = array.getClass().getComponentType();
         if (type.equals(Integer.TYPE)) {
             comparer = new IntComparer((int[])array);
         } else if (type.equals(Long.TYPE)) {
@@ -182,9 +185,9 @@ abstract public class ParallelSorter extends SorterTemplate {
 
     static class ComparatorComparer implements Comparer {
         private Object[] a;
-        private Comparator cmp;
+        private Comparator<Object> cmp;
 
-        public ComparatorComparer(Object[] a, Comparator cmp) {
+        public ComparatorComparer(Object[] a, Comparator<Object> cmp) {
             this.a = a;
             this.cmp = cmp;
         }
@@ -197,8 +200,9 @@ abstract public class ParallelSorter extends SorterTemplate {
     static class ObjectComparer implements Comparer {
         private Object[] a;
         public ObjectComparer(Object[] a) { this.a = a; }
-        public int compare(int i, int j) {
-            return ((Comparable)a[i]).compareTo(a[j]);
+        @SuppressWarnings("unchecked")
+		public int compare(int i, int j) {
+            return ((Comparable<Object>)a[i]).compareTo(a[j]);
         }
     }
 
@@ -250,7 +254,7 @@ abstract public class ParallelSorter extends SorterTemplate {
         public int compare(int i, int j) { return a[i] - a[j]; }
     }
 
-    public static class Generator extends AbstractClassGenerator {
+    public static class Generator extends AbstractClassGenerator<ParallelSorter> {
         private static final Source SOURCE = new Source(ParallelSorter.class.getName());
 
         private Object[] arrays;
@@ -268,7 +272,7 @@ abstract public class ParallelSorter extends SorterTemplate {
         }
 
         public ParallelSorter create() {
-            return (ParallelSorter)super.create(ClassesKey.create(arrays));
+            return super.create(ClassesKey.create(arrays));
         }
 
         public void generateClass(ClassVisitor v) throws Exception {
@@ -283,8 +287,10 @@ abstract public class ParallelSorter extends SorterTemplate {
             new ParallelSorterEmitter(v, getClassName(), arrays);
         }
 
-        protected Object firstInstance(Class type) {
-            return ((ParallelSorter)ReflectUtils.newInstance(type)).newInstance(arrays);
+        @Override
+       protected ParallelSorter firstInstance(Class<ParallelSorter> type) {
+            return ReflectUtils.newInstance(type).newInstance(arrays);
         }
+
     }
 }

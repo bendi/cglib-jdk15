@@ -33,18 +33,18 @@ public class TestKeyFactory extends net.sf.cglib.CodeGenTestCase {
 
     public interface CharArrayKey {
         public Object newInstance(char[] a);
-    }    
+    }
 
     public interface BooleanArrayKey {
         public Object newInstance(boolean[] a);
-    }    
+    }
 
     public interface ClassArrayKey {
-        public Object newInstance(Class[] a);
-    }    
+        public Object newInstance(Class<?>[] a);
+    }
 
     public interface MethodKey {
-        public Object newInstance(Class returnType, Class[] parameterTypes);
+        public Object newInstance(Class<?> returnType, Class<?>[] parameterTypes);
     }
 
     public interface PrimitivesKey {
@@ -62,15 +62,15 @@ public class TestKeyFactory extends net.sf.cglib.CodeGenTestCase {
     public interface FloatKey {
         public Object newInstance(float f);
     }
-    
+
     public void testSimple() throws Exception {
         MyKey mykey = (MyKey)KeyFactory.create(MyKey.class);
         assertTrue(mykey.newInstance(5, new int[]{ 6, 7 }, false).hashCode() ==
                    mykey.newInstance(5, new int[]{ 6, 7 }, false).hashCode());
     }
 
-    private Object helper(Class type) {
-        KeyFactory.Generator gen = new KeyFactory.Generator();
+    private <T> T helper(Class<T> type) {
+        KeyFactory.Generator<T> gen = new KeyFactory.Generator<T>();
         gen.setInterface(type);
         gen.setHashConstant(5);
         gen.setHashMultiplier(3);
@@ -100,13 +100,13 @@ public class TestKeyFactory extends net.sf.cglib.CodeGenTestCase {
         Object instance = factory.newInstance(7f);
         assertTrue(instance.hashCode() == 1088421903);
     }
-    
+
     public void testNested() throws Exception {
-        KeyFactory.Generator gen = new KeyFactory.Generator();
+        KeyFactory.Generator<MyKey2> gen = new KeyFactory.Generator<MyKey2>();
         gen.setInterface(MyKey2.class);
         gen.setHashConstant(17);
         gen.setHashMultiplier(37);
-        MyKey2 mykey2 = (MyKey2)gen.create();
+        MyKey2 mykey2 = gen.create();
         Object instance = mykey2.newInstance(new int[][]{ { 1, 2 }, { 3, 4 } });
         assertTrue(instance.hashCode() == 31914243);
     }
@@ -127,7 +127,7 @@ public class TestKeyFactory extends net.sf.cglib.CodeGenTestCase {
 
     public void testMethodKey() throws Exception {
         MethodKey factory = (MethodKey)KeyFactory.create(MethodKey.class);
-        Set methodSet = new HashSet();
+        Set<Object> methodSet = new HashSet<Object>();
         methodSet.add(factory.newInstance(Number.class, new Class[]{ int.class }));
         assertTrue(methodSet.contains(factory.newInstance(Number.class, new Class[]{ int.class })));
         assertTrue(!methodSet.contains(factory.newInstance(Number.class, new Class[]{ Integer.class })));
@@ -137,30 +137,30 @@ public class TestKeyFactory extends net.sf.cglib.CodeGenTestCase {
         MyKey mykey = (MyKey)KeyFactory.create(MyKey.class);
         assertTrue(!mykey.newInstance(5, new int[]{ 6, 7 }, false).equals(new Object()));
     }
-    
-    
-    
+
+
+
     public TestKeyFactory(String testName) {
         super(testName);
     }
-    
+
     public static void main(String[] args) {
         junit.textui.TestRunner.run(suite());
     }
-    
+
     public static Test suite() {
         return new TestSuite(TestKeyFactory.class);
     }
-    
+
     public void perform(ClassLoader loader) throws Throwable {
-        
+
         KeyFactory.create(loader, MyKey.class, null );
     }
-    
+
     public void testFailOnMemoryLeak() throws Throwable {
         if(leaks()){
           fail("Memory Leak in KeyFactory");
         }
     }
-    
+
 }

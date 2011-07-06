@@ -15,8 +15,9 @@
  */
 package net.sf.cglib.core;
 
-import net.sf.cglib.CodeGenTestCase;
-import junit.framework.*;
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 public class TestTinyBitSet extends TestCase {
     public void testGetSetClear() {
@@ -27,7 +28,7 @@ public class TestTinyBitSet extends TestCase {
         b.clear(5);
         assertTrue(!b.get(5));
     }
-    
+
     public void testLength() {
         TinyBitSet b = new TinyBitSet();
         b.set(10);
@@ -56,11 +57,11 @@ public class TestTinyBitSet extends TestCase {
     public TestTinyBitSet(String testName) {
         super(testName);
     }
-    
+
     public static void main(String[] args) {
         junit.textui.TestRunner.run(suite());
     }
-    
+
     public static Test suite() {
         return new TestSuite(TestTinyBitSet.class);
     }

@@ -15,13 +15,18 @@
  */
 package net.sf.cglib.transform.impl;
 
-import net.sf.cglib.transform.*;
+import java.lang.reflect.Method;
+
+import junit.framework.Test;
+import junit.framework.TestSuite;
 import net.sf.cglib.core.Constants;
 import net.sf.cglib.core.ReflectUtils;
-import net.sf.cglib.beans.*;
-import java.util.*;
-import java.lang.reflect.Method;
-import junit.framework.*;
+import net.sf.cglib.transform.ClassFilter;
+import net.sf.cglib.transform.ClassTransformer;
+import net.sf.cglib.transform.ClassTransformerChain;
+import net.sf.cglib.transform.ClassTransformerFactory;
+import net.sf.cglib.transform.TransformingClassLoader;
+
 import org.objectweb.asm.Type;
 
 /**
@@ -44,7 +49,7 @@ public class TestTransformingLoader extends net.sf.cglib.CodeGenTestCase {
         ClassTransformer t1 = getExampleTransformer("herby", Constants.TYPE_STRING);
         ClassTransformer t2 = getExampleTransformer("derby", Type.DOUBLE_TYPE);
         ClassTransformer chain = new ClassTransformerChain(new ClassTransformer[]{ t1, t2 });
-        Class loaded = loadHelper(chain, Example.class);
+        Class<?> loaded = loadHelper(chain, Example.class);
         Object obj = loaded.newInstance();
         String value = "HELLO";
         loaded.getMethod("setHerby", new Class[]{ String.class }).invoke(obj, new Object[]{ value });
@@ -53,9 +58,7 @@ public class TestTransformingLoader extends net.sf.cglib.CodeGenTestCase {
         loaded.getMethod("setDerby", new Class[]{ Double.TYPE }).invoke(obj, new Object[]{ new Double(1.23456789d) });
     }
 
-    private static Class inited;
-
-    public static void initStatic(Class foo) {
+    public static void initStatic(Class<?> foo) {
         System.err.println("INITING: " + foo);
     }
 
@@ -63,8 +66,8 @@ public class TestTransformingLoader extends net.sf.cglib.CodeGenTestCase {
         Method m = ReflectUtils.findMethod("net.sf.cglib.transform.impl.TestTransformingLoader.initStatic(Class)");
         ClassTransformer t = new AddStaticInitTransformer(m);
         // t = new ClassTransformerChain(new ClassTransformer[]{ t, new ClassTransformerTee(new org.objectweb.asm.util.TraceClassVisitor(null, new java.io.PrintWriter(System.out))) });
-        Class loaded = loadHelper(t, Example.class);
-        Object obj = loaded.newInstance();
+        Class<?> loaded = loadHelper(t, Example.class);
+        loaded.newInstance();
         // TODO
     }
 
@@ -77,13 +80,13 @@ public class TestTransformingLoader extends net.sf.cglib.CodeGenTestCase {
                 return true;
             }
         });
-        Class loaded = loadHelper(t, Example.class);
+        loadHelper(t, Example.class);
         // TODO
     }
 
     public void testFieldProvider() throws Exception {
         ClassTransformer t = new FieldProviderTransformer();
-        Class loaded = loadHelper(t, Example.class);
+        loadHelper(t, Example.class);
         // TODO
 //         FieldProvider fp = (FieldProvider)loaded.newInstance();
 //         assertTrue(((Integer)fp.getField("example")).intValue() == 42);
@@ -96,16 +99,16 @@ public class TestTransformingLoader extends net.sf.cglib.CodeGenTestCase {
 //         } catch (IllegalArgumentException ignore) { }
     }
 
-    private static Class loadHelper( final ClassTransformer t, Class target) throws ClassNotFoundException {
+    private static Class<?> loadHelper( final ClassTransformer t, Class<?> target) throws ClassNotFoundException {
         ClassLoader parent = TestTransformingLoader.class.getClassLoader();
         TransformingClassLoader loader = new TransformingClassLoader(parent, TEST_FILTER,
-        
+
            new ClassTransformerFactory(){
                   public ClassTransformer  newInstance(){
                      return t;
                   }
         }
-        
+
         );
         return loader.loadClass(target.getName());
     }
@@ -113,19 +116,19 @@ public class TestTransformingLoader extends net.sf.cglib.CodeGenTestCase {
     public TestTransformingLoader(String testName) {
         super(testName);
     }
-    
+
     public static void main(String[] args) {
         junit.textui.TestRunner.run(suite());
     }
-    
+
     public static Test suite() {
         return new TestSuite(TestTransformingLoader.class);
     }
 
     public void perform(ClassLoader loader) throws Throwable {
-    }    
-    
+    }
+
     public void testFailOnMemoryLeak() throws Throwable {
     }
-    
+
 }

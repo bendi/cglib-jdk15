@@ -15,11 +15,11 @@
  */
 package net.sf.cglib.proxy;
 
-import net.sf.cglib.CodeGenTestCase;
-import java.beans.*;
 import java.lang.reflect.Method;
-import java.util.*;
-import junit.framework.*;
+
+import junit.framework.Test;
+import junit.framework.TestSuite;
+import net.sf.cglib.CodeGenTestCase;
 
 /**
  * @author Chris Nokleberg
@@ -33,7 +33,7 @@ public class TestDispatcher extends CodeGenTestCase {
     interface Bar {
         String bar();
     }
-    
+
     public void testSimple() throws Exception {
         final Object[] impls = new Object[]{
             new Foo() {
@@ -61,16 +61,16 @@ public class TestDispatcher extends CodeGenTestCase {
             }
         };
 
-        Enhancer e = new Enhancer();
+        Enhancer<Foo> e = new Enhancer<Foo>();
         e.setInterfaces(new Class[]{ Foo.class, Bar.class });
         e.setCallbacks(callbacks);
-        e.setCallbackFilter(new CallbackFilter() {
+        e.setCallbackFilter(new CallbackFilter<Foo>() {
             public int accept(Method method) {
                 return (method.getDeclaringClass().equals(Foo.class)) ? 0 : 1;
             }
         });
         Object obj = e.create();
-        
+
         assertTrue(((Foo)obj).foo().equals("foo1"));
         assertTrue(((Bar)obj).bar().equals("bar1"));
 
@@ -85,19 +85,19 @@ public class TestDispatcher extends CodeGenTestCase {
     public TestDispatcher(String testName) {
         super(testName);
     }
-    
+
     public static void main(String[] args) {
         junit.textui.TestRunner.run(suite());
     }
-    
+
     public static Test suite() {
         return new TestSuite(TestDispatcher.class);
     }
-    
+
     public void perform(ClassLoader loader) throws Throwable {
     }
-    
+
     public void testFailOnMemoryLeak() throws Throwable {
     }
-    
+
 }

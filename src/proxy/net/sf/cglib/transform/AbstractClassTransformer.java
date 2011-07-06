@@ -15,7 +15,6 @@
  */
 package net.sf.cglib.transform;
 
-import net.sf.cglib.core.CodeGenerationException;
 import org.objectweb.asm.ClassAdapter;
 import org.objectweb.asm.ClassVisitor;
 

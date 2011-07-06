@@ -15,19 +15,17 @@
  */
 package net.sf.cglib.proxy;
 
+import junit.framework.Test;
+import junit.framework.TestSuite;
 import net.sf.cglib.CodeGenTestCase;
-import java.lang.reflect.*;
-import java.util.*;
-import junit.framework.*;
 
 public class TestNoOp extends CodeGenTestCase {
     private static class Foo {
-        public Foo() { }
         public String toString() {
             return "foo";
         }
     }
-    
+
     public void testNoOp() {
         Object obj = Enhancer.create(Foo.class, NoOp.INSTANCE);
         assertTrue("foo".equals(obj.toString()));
@@ -36,19 +34,19 @@ public class TestNoOp extends CodeGenTestCase {
     public TestNoOp(String testName) {
         super(testName);
     }
-    
+
     public static void main(String[] args) {
         junit.textui.TestRunner.run(suite());
     }
-    
+
     public static Test suite() {
         return new TestSuite(TestNoOp.class);
     }
-    
+
     public void perform(ClassLoader loader) throws Throwable {
     }
-    
+
     public void testFailOnMemoryLeak() throws Throwable {
     }
-    
+
 }

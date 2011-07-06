@@ -23,13 +23,15 @@ import net.sf.cglib.core.CodeGenerationException;
  * @author Juozas Baliuka
  */
 public class UndeclaredThrowableException extends CodeGenerationException {
-    /**
+	private static final long serialVersionUID = -3396864428269221913L;
+
+	/**
      * Creates a new instance of <code>UndeclaredThrowableException</code> without detail message.
      */
     public UndeclaredThrowableException(Throwable t) {
         super(t);
     }
-    
+
     public Throwable getUndeclaredThrowable() {
         return getCause();
     }

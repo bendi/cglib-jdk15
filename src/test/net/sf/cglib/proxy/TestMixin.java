@@ -15,11 +15,14 @@
  */
 package net.sf.cglib.proxy;
 
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
+import java.util.HashSet;
+import java.util.Set;
+
+import junit.framework.Test;
+import junit.framework.TestSuite;
 import net.sf.cglib.CodeGenTestCase;
-import java.beans.*;
-import java.lang.reflect.Method;
-import java.util.*;
-import junit.framework.*;
 
 /**
  * @author Chris Nokleberg
@@ -38,7 +41,7 @@ public class TestMixin extends CodeGenTestCase {
         assertTrue(((DI1)obj).herby().equals("D1"));
         assertTrue(((DI2)obj).derby().equals("D2"));
     }
- 
+
     public void testOverride() throws Exception {
         Object obj = Mixin.create(new Object[]{ new D1(), new D4() });
         assertTrue(((DI1)obj).herby().equals("D1"));
@@ -60,7 +63,7 @@ public class TestMixin extends CodeGenTestCase {
 
     public void testBeans() throws Exception {
         Object obj = Mixin.createBean(new Object[]{ new DBean1(), new DBean2() });
-        Set getters = getGetters(obj.getClass());
+        Set<String> getters = getGetters(obj.getClass());
         assertTrue(getters.size() == 3); // name, age, class
         assertTrue(getters.contains("name"));
         assertTrue(getters.contains("age"));
@@ -72,7 +75,7 @@ public class TestMixin extends CodeGenTestCase {
         gen.setStyle(Mixin.STYLE_EVERYTHING);
         gen.setDelegates(new Object[]{ new DBean1(), new DBean2() });
         Object obj = gen.create();
-        Set getters = getGetters(obj.getClass());
+        Set<String> getters = getGetters(obj.getClass());
         assertTrue(getters.size() == 3); // name, age, class
         assertTrue(obj instanceof DI1);
         assertTrue(new DBean1().herby().equals(((DI1)obj).herby()));
@@ -83,11 +86,11 @@ public class TestMixin extends CodeGenTestCase {
         gen.setStyle(Mixin.STYLE_BEANS);
         gen.setClasses(new Class[]{ DBean1.class, DBean2.class });
         Mixin mixin = gen.create();
-        Object obj = mixin.newInstance(new Object[]{ new DBean1(), new DBean2() });
+        mixin.newInstance(new Object[]{ new DBean1(), new DBean2() });
     }
 
-    private static Set getGetters(Class beanClass) throws Exception {
-        Set getters = new HashSet();
+    private static Set<String> getGetters(Class<?> beanClass) throws Exception {
+        Set<String> getters = new HashSet<String>();
         PropertyDescriptor[] descriptors =
             Introspector.getBeanInfo(beanClass).getPropertyDescriptors();
         for (int i = 0; i < descriptors.length; i++) {
@@ -98,37 +101,26 @@ public class TestMixin extends CodeGenTestCase {
         return getters;
     }
 
-    private static PropertyDescriptor getProperty(Class beanClass, String property) throws Exception {
-        Set getters = new HashSet();
-        PropertyDescriptor[] descriptors =
-            Introspector.getBeanInfo(beanClass).getPropertyDescriptors();
-        for (int i = 0; i < descriptors.length; i++) {
-            if (descriptors[i].getName().equals(property))
-                return descriptors[i];
-        }
-        return null;
-    }
-
     public TestMixin(String testName) {
         super(testName);
     }
-    
+
     public static void main(String[] args) {
         junit.textui.TestRunner.run(suite());
     }
-    
+
     public static Test suite() {
         return new TestSuite(TestMixin.class);
     }
-    
+
     public void perform(ClassLoader loader) throws Throwable {
         Mixin.createBean(loader, new Object[]{ new DBean1(), new DBean2() });
     }
-    
+
     public void testFailOnMemoryLeak() throws Throwable {
         if(leaks()){
           fail("Memory Leak in Mixin");
         }
     }
-    
+
 }

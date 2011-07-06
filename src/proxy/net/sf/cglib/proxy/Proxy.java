@@ -17,7 +17,7 @@ package net.sf.cglib.proxy;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
-import java.lang.reflect.Member;
+
 import net.sf.cglib.core.CodeGenerationException;
 
 /**
@@ -36,9 +36,11 @@ import net.sf.cglib.core.CodeGenerationException;
  * @version $Id: Proxy.java,v 1.6 2004/06/24 21:15:19 herbyderby Exp $
  */
 public class Proxy implements Serializable {
-    protected InvocationHandler h;
+	private static final long serialVersionUID = 1L;
 
-    private static final CallbackFilter BAD_OBJECT_METHOD_FILTER = new CallbackFilter() {
+	protected InvocationHandler h;
+
+    private static final CallbackFilter<ProxyImpl> BAD_OBJECT_METHOD_FILTER = new CallbackFilter<ProxyImpl>() {
         public int accept(Method method) {
             if (method.getDeclaringClass().getName().equals("java.lang.Object")) {
                 String name = method.getName();
@@ -59,7 +61,9 @@ public class Proxy implements Serializable {
 
     // private for security of isProxyClass
     private static class ProxyImpl extends Proxy {
-        protected ProxyImpl(InvocationHandler h) {
+		private static final long serialVersionUID = 1L;
+
+		protected ProxyImpl(InvocationHandler h) {
             super(h);
         }
     }
@@ -71,8 +75,8 @@ public class Proxy implements Serializable {
         return ((Proxy)proxy).h;
     }
 
-    public static Class getProxyClass(ClassLoader loader, Class[] interfaces) {
-        Enhancer e = new Enhancer();
+    public static Class<ProxyImpl> getProxyClass(ClassLoader loader, Class<?>[] interfaces) {
+        Enhancer<ProxyImpl> e = new Enhancer<ProxyImpl>();
         e.setSuperclass(ProxyImpl.class);
         e.setInterfaces(interfaces);
         e.setCallbackTypes(new Class[]{
@@ -84,13 +88,13 @@ public class Proxy implements Serializable {
         return e.createClass();
     }
 
-    public static boolean isProxyClass(Class cl) {
+    public static boolean isProxyClass(Class<?> cl) {
         return cl.getSuperclass().equals(ProxyImpl.class);
     }
 
-    public static Object newProxyInstance(ClassLoader loader, Class[] interfaces, InvocationHandler h) {
+    public static Object newProxyInstance(ClassLoader loader, Class<?>[] interfaces, InvocationHandler h) {
         try {
-            Class clazz = getProxyClass(loader, interfaces);
+            Class<ProxyImpl> clazz = getProxyClass(loader, interfaces);
             return clazz.getConstructor(new Class[]{ InvocationHandler.class }).newInstance(new Object[]{ h });
         } catch (RuntimeException e) {
             throw e;

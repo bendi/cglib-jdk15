@@ -15,8 +15,8 @@
  */
 package net.sf.cglib.reflect;
 
-import java.lang.reflect.Method;
-import junit.framework.*;
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 /**
  * @version $Id: TestDelegates.java,v 1.4 2004/06/24 21:15:16 herbyderby Exp $
@@ -120,7 +120,7 @@ public class TestDelegates extends net.sf.cglib.CodeGenTestCase {
         p.fireEvent();
         assertTrue(p.test == 2);
         p.removeListener(l1);
-        p.fireEvent(); 
+        p.fireEvent();
         assertTrue(p.test == 3);
     }
 
@@ -151,19 +151,19 @@ public class TestDelegates extends net.sf.cglib.CodeGenTestCase {
     public TestDelegates(String testName) {
         super(testName);
     }
-    
+
     public static void main(String[] args) {
         junit.textui.TestRunner.run(suite());
     }
-    
+
     public static Test suite() {
         return new TestSuite(TestDelegates.class);
     }
 
     public void perform(ClassLoader loader) throws Throwable {
-    }    
-    
+    }
+
     public void testFailOnMemoryLeak() throws Throwable {
     }
-    
+
 }

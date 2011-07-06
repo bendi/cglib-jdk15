@@ -18,17 +18,17 @@ package net.sf.cglib.core;
 import java.lang.reflect.*;
 import org.objectweb.asm.Type;
 
-public class VisibilityPredicate implements Predicate {
+public class VisibilityPredicate implements Predicate<Member> {
     private boolean protectedOk;
     private String pkg;
 
-    public VisibilityPredicate(Class source, boolean protectedOk) {
+    public VisibilityPredicate(Class<?> source, boolean protectedOk) {
         this.protectedOk = protectedOk;
         pkg = TypeUtils.getPackageName(Type.getType(source));
     }
 
-    public boolean evaluate(Object arg) {
-        int mod = (arg instanceof Member) ? ((Member)arg).getModifiers() : ((Integer)arg).intValue();
+    public boolean evaluate(Member arg) {
+        int mod = arg.getModifiers() ;
         if (Modifier.isPrivate(mod)) {
             return false;
         } else if (Modifier.isPublic(mod)) {

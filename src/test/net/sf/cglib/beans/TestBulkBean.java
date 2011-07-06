@@ -37,7 +37,7 @@ public class TestBulkBean extends TestCase {
         "getName",
         "getPrivateName"
     } ;
-                           
+
     private String setters[] = {
         "setIntP",
         "setLongP",
@@ -52,8 +52,8 @@ public class TestBulkBean extends TestCase {
         "setName",
         "setPrivateName"
     };
-                           
-    private Class types[] = {
+
+    private Class<?>[] types = {
         int.class,
         long.class,
         byte.class,
@@ -67,8 +67,8 @@ public class TestBulkBean extends TestCase {
         String.class,
         String.class
     };
-                           
-    private Object values[] = {
+
+    private Object[] values = {
         new Integer(2) ,
         new Long(4) ,
         new Byte((byte)8),
@@ -82,33 +82,33 @@ public class TestBulkBean extends TestCase {
         "test2",
         "private"
     };
-       
-    
-    
+
+
+
     public TestBulkBean(java.lang.String testName) {
         super(testName);
     }
-    
+
     public static void main(java.lang.String[] args) {
         junit.textui.TestRunner.run(suite());
     }
-    
+
     public static Test suite() {
         return new TestSuite(TestBulkBean.class);
     }
-    
+
     /** Test of create method, of class net.sf.cglib.BulkBean. */
     public void testGetInstance() throws Throwable {
         BulkBean mClass = BulkBean.create(MA.class, getters, setters, types);
-      
+
         MA bean = new MA();
-      
+
         mClass.setPropertyValues( bean, values );
         Object values1[] = mClass.getPropertyValues( bean );
-      
+
         for( int i = 0; i < types.length; i++  ){
             assertEquals(" property " + getters[i] + "/" + setters[i] , values[i] , values1[i] );
-        }  
+        }
     }
 
     public void testEmpty() throws Throwable {
@@ -116,7 +116,7 @@ public class TestBulkBean extends TestCase {
     }
 
     public void testBadTypes() throws Throwable {
-        Class[] types2 = (Class[])types.clone();
+        Class<?>[] types2 = (Class[])types.clone();
         types2[2] = String.class;
         try {
             BulkBean.create(MA.class, getters, setters, types2);
@@ -160,62 +160,62 @@ public class TestBulkBean extends TestCase {
     }
 
     public void testBulkBeanPerformance() throws Throwable{
-    
+
         int iterations = 100000;
-       
-        System.out.println(); 
+
+        System.out.println();
         System.out.println("iteration count: " + iterations);
-        System.out.println(); 
-       
+        System.out.println();
+
         BulkBean mClass = new BulkBeanReflectImpl( MA.class,getters,setters,types );
-       
+
         System.out.println( mClass.getClass().getName() + ": " );
         int b = performanceTest( mClass, iterations );
         System.out.println( b + " ms.   "  + ( b/(float)iterations)  + " per iteration" );
-        System.out.println(); 
-       
-       
+        System.out.println();
+
+
         mClass = BulkBean.create(MA.class, getters, setters, types);
-                                       
-      
+
+
         System.out.println( mClass.getClass().getName() + ": " );
         int a = performanceTest( mClass, iterations );
         System.out.println( a + " ms.   " + ( a/(float)iterations)  + " per iteration" );
-       
-       
+
+
         System.out.println( "factor: " + b/(float)a );
-        
+
         mClass = new BulkBeanPlainImpl();
-        
+
         System.out.println( mClass.getClass().getName() + ": " );
          a = performanceTest( mClass, iterations );
         System.out.println( a + " ms.   " + ( a/(float)iterations)  + " per iteration" );
-       
-        
+
+
     }
-    
+
     public int performanceTest( BulkBean mc, int iterations ) throws Throwable{
-       
-         
-         
+
+
+
         long start = System.currentTimeMillis();
         for( int i = 0; i< iterations; i++   ){
             MA bean = new MA(); // (MA)mc.newInstance();
             mc.setPropertyValues( bean, values );
             mc.getPropertyValues( bean, values );
         }
-       
+
         return (int)( System.currentTimeMillis() - start );
     }
-    
+
     private static class BulkBeanPlainImpl extends BulkBean {
-        
-        
+
+
         public void getPropertyValues(Object bean, Object[] values) {
-            
+
             int i = 0;
             MA ma = (MA) bean;
-            
+
             values[i++] = new Integer(ma.getIntP());
             values[i++] = new Long(ma.getLongP());
             values[i++] = new Byte(ma.getByteP());
@@ -228,16 +228,16 @@ public class TestBulkBean extends TestCase {
             values[i++] = ma.getId();
             values[i++] = ma.getName();
             values[i++] = ma.getPrivateName();
-            
-            
+
+
         }
-        
-        
+
+
         public void setPropertyValues(Object bean, Object[] values) {
-            
+
             int i = 0;
             MA ma = (MA) bean;
-            
+
             ma.setIntP(((Number)values[i++]).intValue());
             ma.setLongP(((Number)values[i++]).longValue());
             ma.setByteP(((Number)values[i++]).byteValue());
@@ -246,87 +246,87 @@ public class TestBulkBean extends TestCase {
             ma.setBooleanP(((Boolean)values[i++]).booleanValue());
             ma.setCharP( ((Character)values[i++]).charValue()) ;
             ma.setDoubleP(((Number)values[i++]).doubleValue());
-            ma.setStringP((String) values[i++]); 
+            ma.setStringP((String) values[i++]);
             ma.setId((Long) values[i++]);
             ma.setName((String) values[i++]);
             ma.setPrivateName((String) values[i++]);
-            
-            
+
+
         }
-        
-        
+
+
     }
-    
+
     /** Generated implementation of abstract class net.sf.cglib.BulkBean. Please fill dummy bodies of generated methods. */
     private static class BulkBeanReflectImpl extends BulkBean {
-        
+
         private   Method gets[];
         private   Method sets[];
-        private   int size ;    
-        public BulkBeanReflectImpl(Class target, String[] getters, String[] setters, Class[] types) {
+        private   int size ;
+        public BulkBeanReflectImpl(Class<?> target, String[] getters, String[] setters, Class<?>[] types) {
             this.target = target;
             this.types = types;
             this.getters = getters;
             this.setters = setters;
 
-            size = this.types.length;        
+            size = this.types.length;
             gets = new Method [size];
             sets = new Method [size];
-               
-            try{ 
-               
+
+            try{
+
                 for( int i = 0; i< size; i++  ) {
-                
-                    if( getters[i] != null ){   
+
+                    if( getters[i] != null ){
                         gets[i] =  target.getDeclaredMethod( getters[i], new Class[]{} );
                         gets[i].setAccessible(true);
-                    } 
-                    if( setters[i] != null ) {  
+                    }
+                    if( setters[i] != null ) {
                         sets[i] =  target.getDeclaredMethod( setters[i], new Class[]{ types[i] } );
                         sets[i].setAccessible(true);
-                    } 
-               
-              
+                    }
+
+
                 }
             }catch( Exception e ){
                 throw new Error(e.getClass().getName() + ":" +  e.getMessage() );
-            } 
+            }
         }
-        
+
         public void getPropertyValues(Object bean, Object[] values) {
-            
+
             try{
                 for( int i = 0; i < size ; i++  ){
                     if( this.gets[i] != null ){
-                        values[i] = gets[i].invoke(bean, (Object[])null );             
+                        values[i] = gets[i].invoke(bean, (Object[])null );
                     }
                 }
             }catch( Exception e ){
-                throw new Error( e.getMessage() );     
-            } 
-        }
-        
-        public void setPropertyValues(Object bean, Object[] values) {
-            try{
-           
-                for( int i = 0; i < size ; i++  ){
-                    if( this.sets[i] != null ){
-                        sets[i].invoke(bean, new Object[]{ values[i] } );             
-                    }
-                }
-           
-           
-            }catch( Exception e ){
-                e.printStackTrace();
-                throw new Error( e.getMessage() );     
+                throw new Error( e.getMessage() );
             }
         }
-        
+
+        public void setPropertyValues(Object bean, Object[] values) {
+            try{
+
+                for( int i = 0; i < size ; i++  ){
+                    if( this.sets[i] != null ){
+                        sets[i].invoke(bean, new Object[]{ values[i] } );
+                    }
+                }
+
+
+            }catch( Exception e ){
+                e.printStackTrace();
+                throw new Error( e.getMessage() );
+            }
+        }
+
     }
-    
+
     // Add test methods here, they have to start with 'test' name.
     // for example:
     // public void testHello() {}
-    
-    
+
+
 }

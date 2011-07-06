@@ -15,11 +15,17 @@
  */
 package net.sf.cglib.transform.impl;
 
-import net.sf.cglib.transform.*;
-import java.lang.reflect.*;
-import java.util.*;
-import net.sf.cglib.core.*;
-import org.objectweb.asm.Attribute;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+
+import net.sf.cglib.core.CodeEmitter;
+import net.sf.cglib.core.CodeGenerationException;
+import net.sf.cglib.core.Constants;
+import net.sf.cglib.core.ReflectUtils;
+import net.sf.cglib.core.Signature;
+import net.sf.cglib.core.TypeUtils;
+import net.sf.cglib.transform.ClassEmitterTransformer;
+
 import org.objectweb.asm.Type;
 
 /**
@@ -29,13 +35,13 @@ public class AddDelegateTransformer extends ClassEmitterTransformer {
     private static final String DELEGATE = "$CGLIB_DELEGATE";
     private static final Signature CSTRUCT_OBJECT =
       TypeUtils.parseSignature("void <init>(Object)");
-    
-    private Class[] delegateIf;
-    private Class delegateImpl;
+
+    private Class<?>[] delegateIf;
+    private Class<?> delegateImpl;
     private Type delegateType;
-    
+
     /** Creates a new instance of AddDelegateTransformer */
-    public AddDelegateTransformer(Class delegateIf[], Class delegateImpl) {
+    public AddDelegateTransformer(Class<?>[] delegateIf, Class<?> delegateImpl) {
         try {
             delegateImpl.getConstructor(new Class[]{ Object.class });
             this.delegateIf = delegateIf;
@@ -45,14 +51,14 @@ public class AddDelegateTransformer extends ClassEmitterTransformer {
             throw new CodeGenerationException(e);
         }
     }
-    
+
     public void begin_class(int version, int access, String className, Type superType, Type[] interfaces, String sourceFile) {
-        
+
         if(!TypeUtils.isInterface(access)){
-            
+
         Type[] all = TypeUtils.add(interfaces, TypeUtils.getTypes(delegateIf));
         super.begin_class(version, access, className, superType, all, sourceFile);
-        
+
         declare_field(Constants.ACC_PRIVATE | Constants.ACC_TRANSIENT,
                       DELEGATE,
                       delegateType,

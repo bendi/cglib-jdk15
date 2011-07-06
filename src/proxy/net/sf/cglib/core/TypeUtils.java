@@ -19,8 +19,8 @@ import java.util.*;
 import org.objectweb.asm.Type;
 
 public class TypeUtils {
-    private static final Map transforms = new HashMap();
-    private static final Map rtransforms = new HashMap();
+    private static final Map<String, String> transforms = new HashMap<String, String>();
+    private static final Map<String, String> rtransforms = new HashMap<String, String>();
 
     private TypeUtils() {
     }
@@ -62,7 +62,7 @@ public class TypeUtils {
     public static boolean isAbstract(int access) {
         return (Constants.ACC_ABSTRACT & access) != 0;
     }
-    
+
     public static boolean isInterface(int access) {
         return (Constants.ACC_INTERFACE & access) != 0;
     }
@@ -70,15 +70,15 @@ public class TypeUtils {
     public static boolean isPrivate(int access) {
         return (Constants.ACC_PRIVATE & access) != 0;
     }
-    
+
     public static boolean isSynthetic(int access) {
         return (Constants.ACC_SYNTHETIC & access) != 0;
     }
-    
+
     public static boolean isBridge(int access) {
     	return (Constants.ACC_BRIDGE & access) != 0;
     }
-    
+
     // getPackage returns null on JDK 1.2
     public static String getPackageName(Type type) {
         return getPackageName(getClassName(type));
@@ -88,7 +88,7 @@ public class TypeUtils {
         int idx = className.lastIndexOf('.');
         return (idx < 0) ? "" : className.substring(0, idx);
     }
-    
+
     public static String upperFirst(String s) {
         if (s == null || s.length() == 0) {
             return s;
@@ -110,7 +110,7 @@ public class TypeUtils {
         if (types == null) {
             return new Type[]{ extra };
         } else {
-            List list = Arrays.asList(types);
+            List<Type> list = Arrays.asList(types);
             if (list.contains(extra)) {
                 return types;
             }
@@ -172,7 +172,7 @@ public class TypeUtils {
         String methodName = s.substring(space + 1, lparen);
         StringBuffer sb = new StringBuffer();
         sb.append('(');
-        for (Iterator it = parseTypes(s, lparen + 1, rparen).iterator(); it.hasNext();) {
+        for (Iterator<String> it = parseTypes(s, lparen + 1, rparen).iterator(); it.hasNext();) {
             sb.append(it.next());
         }
         sb.append(')');
@@ -185,7 +185,7 @@ public class TypeUtils {
     }
 
     public static Type[] parseTypes(String s) {
-        List names = parseTypes(s, 0, s.length());
+        List<String> names = parseTypes(s, 0, s.length());
         Type[] types = new Type[names.size()];
         for (int i = 0; i < types.length; i++) {
             types[i] = Type.getType((String)names.get(i));
@@ -208,8 +208,8 @@ public class TypeUtils {
         return parseSignature("void <init>(" + sig + ")"); // TODO
     }
 
-    private static List parseTypes(String s, int mark, int end) {
-        List types = new ArrayList(5);
+    private static List<String> parseTypes(String s, int mark, int end) {
+        List<String> types = new ArrayList<String>(5);
         for (;;) {
             int next = s.indexOf(',', mark);
             if (next < 0) {
@@ -321,7 +321,7 @@ public class TypeUtils {
         return method.getSignature().getName().equals(Constants.CONSTRUCTOR_NAME);
     }
 
-    public static Type[] getTypes(Class[] classes) {
+    public static Type[] getTypes(Class<?>[] classes) {
         if (classes == null) {
             return null;
         }

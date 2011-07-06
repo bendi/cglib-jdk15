@@ -22,17 +22,17 @@ import java.util.*;
 /**
  * @version $Id: CallbackHelper.java,v 1.2 2004/06/24 21:15:20 herbyderby Exp $
  */
-abstract public class CallbackHelper
-implements CallbackFilter
+abstract public class CallbackHelper<T>
+implements CallbackFilter<T>
 {
-    private Map methodMap = new HashMap();
-    private List callbacks = new ArrayList();
-    
-    public CallbackHelper(Class superclass, Class[] interfaces)
+    private Map<Method,Integer> methodMap = new HashMap<Method,Integer>();
+    private List<Object> callbacks = new ArrayList<Object>();
+
+    public CallbackHelper(Class<T> superclass, Class<?>[] interfaces)
     {
-        List methods = new ArrayList();
+        List<Method> methods = new ArrayList<Method>();
         Enhancer.getMethods(superclass, interfaces, methods);
-        Map indexes = new HashMap();
+        Map<Object, Integer> indexes = new HashMap<Object, Integer>();
         for (int i = 0, size = methods.size(); i < size; i++) {
             Method method = (Method)methods.get(i);
             Object callback = getCallback(method);
@@ -66,7 +66,7 @@ implements CallbackFilter
         }
     }
 
-    public Class[] getCallbackTypes()
+    public Class<?>[] getCallbackTypes()
     {
         if (callbacks.size() == 0)
             return new Class[0];
@@ -86,13 +86,13 @@ implements CallbackFilter
     {
         return methodMap.hashCode();
     }
-    
+
     public boolean equals(Object o)
     {
         if (o == null)
             return false;
         if (!(o instanceof CallbackHelper))
             return false;
-        return methodMap.equals(((CallbackHelper)o).methodMap);
+        return methodMap.equals(((CallbackHelper<?>)o).methodMap);
     }
 }

@@ -16,21 +16,26 @@
 package net.sf.cglib.transform.impl;
 
 import java.lang.reflect.Constructor;
-import net.sf.cglib.core.*;
-import net.sf.cglib.transform.*;
-import org.objectweb.asm.Attribute;
+
+import net.sf.cglib.core.Block;
+import net.sf.cglib.core.CodeEmitter;
+import net.sf.cglib.core.Constants;
+import net.sf.cglib.core.EmitUtils;
+import net.sf.cglib.core.Signature;
+import net.sf.cglib.core.TypeUtils;
+import net.sf.cglib.transform.ClassEmitterTransformer;
+
 import org.objectweb.asm.Type;
-import org.objectweb.asm.ClassVisitor;
 
 public class UndeclaredThrowableTransformer extends ClassEmitterTransformer {
     private Type wrapper;
 
-    public UndeclaredThrowableTransformer(Class wrapper) {
+    public UndeclaredThrowableTransformer(Class<?> wrapper) {
         this.wrapper = Type.getType(wrapper);
         boolean found = false;
-        Constructor[] cstructs = wrapper.getConstructors();
+        Constructor<?>[] cstructs = wrapper.getConstructors();
         for (int i = 0; i < cstructs.length; i++) {
-            Class[] types = cstructs[i].getParameterTypes();
+            Class<?>[] types = cstructs[i].getParameterTypes();
             if (types.length == 1 && types[0].equals(Throwable.class)) {
                 found = true;
                 break;

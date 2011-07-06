@@ -24,14 +24,14 @@ import org.apache.tools.ant.Task;
 import org.apache.tools.ant.types.FileSet;
 
 abstract public class AbstractProcessTask extends Task {
-    private Vector filesets = new Vector();
+    private Vector<FileSet> filesets = new Vector<FileSet>();
 
     public void addFileset(FileSet set) {
         filesets.addElement(set);
     }
-    
-    protected Collection getFiles() {
-        Map fileMap = new HashMap();
+
+    protected Collection<File> getFiles() {
+        Map<String, File> fileMap = new HashMap<String, File>();
         Project p = getProject();
         for (int i = 0; i < filesets.size(); i++) {
             FileSet fs = (FileSet)filesets.elementAt(i);
@@ -46,11 +46,11 @@ abstract public class AbstractProcessTask extends Task {
         return fileMap.values();
     }
 
-    
-    
+
+
     public void execute() throws BuildException {
         beforeExecute();
-        for (Iterator it = getFiles().iterator(); it.hasNext();) {
+        for (Iterator<File> it = getFiles().iterator(); it.hasNext();) {
             try {
                 processFile((File)it.next());
             } catch (Exception e) {

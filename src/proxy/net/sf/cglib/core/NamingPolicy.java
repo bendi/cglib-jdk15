@@ -15,7 +15,6 @@
  */
 package net.sf.cglib.core;
 
-import java.util.Set;
 
 /**
  * Customize the generated class name for {@link AbstractClassGenerator}-based utilities.
@@ -30,7 +29,7 @@ public interface NamingPolicy {
      * @param names a predicate that returns true if the given classname has already been used in the same ClassLoader.
      * @return the fully-qualified class name
      */
-    String getClassName(String prefix, String source, Object key, Predicate names);
+    String getClassName(String prefix, String source, Object key, Predicate<String> names);
 
     /**
      * The <code>NamingPolicy</code> in use does not currently, but may

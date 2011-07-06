@@ -15,11 +15,12 @@
  */
 package net.sf.cglib.transform.impl;
 
-import net.sf.cglib.transform.*;
-import net.sf.cglib.core.*;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Attribute;
+import net.sf.cglib.core.CodeEmitter;
+import net.sf.cglib.core.Constants;
+import net.sf.cglib.core.Signature;
+import net.sf.cglib.core.TypeUtils;
+import net.sf.cglib.transform.ClassEmitterTransformer;
+
 import org.objectweb.asm.Type;
 
 public class AccessFieldTransformer extends ClassEmitterTransformer {

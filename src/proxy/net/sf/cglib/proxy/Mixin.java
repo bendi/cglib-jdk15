@@ -15,10 +15,17 @@
  */
 package net.sf.cglib.proxy;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Modifier;
-import java.util.*;
-import net.sf.cglib.core.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
+import net.sf.cglib.core.AbstractClassGenerator;
+import net.sf.cglib.core.ClassesKey;
+import net.sf.cglib.core.KeyFactory;
+import net.sf.cglib.core.ReflectUtils;
+
 import org.objectweb.asm.ClassVisitor;
 
 
@@ -32,9 +39,8 @@ import org.objectweb.asm.ClassVisitor;
  * @version $Id: Mixin.java,v 1.7 2005/09/27 11:42:27 baliuka Exp $
  */
 abstract public class Mixin {
-    private static final MixinKey KEY_FACTORY =
-      (MixinKey)KeyFactory.create(MixinKey.class, KeyFactory.CLASS_BY_NAME);
-    private static final Map ROUTE_CACHE = Collections.synchronizedMap(new HashMap());
+    private static final MixinKey KEY_FACTORY = KeyFactory.create(MixinKey.class, KeyFactory.CLASS_BY_NAME);
+    private static final Map<Object, Route> ROUTE_CACHE = Collections.synchronizedMap(new HashMap<Object, Route>());
 
     public static final int STYLE_INTERFACES = 0;
     public static final int STYLE_BEANS = 1;
@@ -64,7 +70,7 @@ abstract public class Mixin {
      * instead of this static method.
      * TODO
      */
-    public static Mixin create(Class[] interfaces, Object[] delegates) {
+    public static Mixin create(Class<?>[] interfaces, Object[] delegates) {
         Generator gen = new Generator();
         gen.setClasses(interfaces);
         gen.setDelegates(delegates);
@@ -91,10 +97,10 @@ abstract public class Mixin {
         return gen.create();
     }
 
-    public static class Generator extends AbstractClassGenerator {
+    public static class Generator extends AbstractClassGenerator<Mixin> {
         private static final Source SOURCE = new Source(Mixin.class.getName());
 
-        private Class[] classes;
+        private Class<?>[] classes;
         private Object[] delegates;
         private int style = STYLE_INTERFACES;
 
@@ -120,7 +126,7 @@ abstract public class Mixin {
             }
         }
 
-        public void setClasses(Class[] classes) {
+        public void setClasses(Class<?>[] classes) {
             this.classes = classes;
         }
 
@@ -147,7 +153,7 @@ abstract public class Mixin {
                     classes = ReflectUtils.getClasses(delegates);
                 } else {
                     if (delegates != null) {
-                        Class[] temp = ReflectUtils.getClasses(delegates);
+                        Class<?>[] temp = ReflectUtils.getClasses(delegates);
                         if (classes.length != temp.length) {
                             throw new IllegalStateException("Specified classes are incompatible with delegates");
                         }
@@ -161,7 +167,7 @@ abstract public class Mixin {
             }
             setNamePrefix(classes[ReflectUtils.findPackageProtected(classes)].getName());
 
-            return (Mixin)super.create(KEY_FACTORY.newInstance(style, ReflectUtils.getNames( classes ), route));
+            return super.create(KEY_FACTORY.newInstance(style, ReflectUtils.getNames( classes ), route));
         }
 
         public void generateClass(ClassVisitor v) {
@@ -178,18 +184,15 @@ abstract public class Mixin {
             }
         }
 
-        protected Object firstInstance(Class type) {
-            return ((Mixin)ReflectUtils.newInstance(type)).newInstance(delegates);
+        @Override
+        protected Mixin firstInstance(Class<Mixin> type) {
+            return ReflectUtils.newInstance(type).newInstance(delegates);
         }
     }
 
-    public static Class[] getClasses(Object[] delegates) {
-        return (Class[])route(delegates).classes.clone();
+    public static Class<?>[] getClasses(Object[] delegates) {
+        return route(delegates).classes.clone();
     }
-
-//     public static int[] getRoute(Object[] delegates) {
-//         return (int[])route(delegates).route.clone();
-//     }
 
     private static Route route(Object[] delegates) {
         Object key = ClassesKey.create(delegates);
@@ -202,18 +205,19 @@ abstract public class Mixin {
 
     private static class Route
     {
-        private Class[] classes;
+        private Class<?>[] classes;
         private int[] route;
 
-        Route(Object[] delegates) {
-            Map map = new HashMap();
-            ArrayList collect = new ArrayList();
+        @SuppressWarnings("rawtypes")
+		Route(Object[] delegates) {
+            Map<Class<?>, Integer> map = new HashMap<Class<?>, Integer>();
+            ArrayList<Class> collect = new ArrayList<Class>();
             for (int i = 0; i < delegates.length; i++) {
-                Class delegate = delegates[i].getClass();
+                Class<?> delegate = delegates[i].getClass();
                 collect.clear();
                 ReflectUtils.addAllInterfaces(delegate, collect);
-                for (Iterator it = collect.iterator(); it.hasNext();) {
-                    Class iface = (Class)it.next();
+                for (Iterator<Class> it = collect.iterator(); it.hasNext();) {
+                    Class iface = it.next();
                     if (!map.containsKey(iface)) {
                         map.put(iface, new Integer(i));
                     }
@@ -222,8 +226,8 @@ abstract public class Mixin {
             classes = new Class[map.size()];
             route = new int[map.size()];
             int index = 0;
-            for (Iterator it = map.keySet().iterator(); it.hasNext();) {
-                Class key = (Class)it.next();
+            for (Iterator<Class<?>> it = map.keySet().iterator(); it.hasNext();) {
+                Class<?> key = it.next();
                 classes[index] = key;
                 route[index] = ((Integer)map.get(key)).intValue();
                 index++;

@@ -34,7 +34,7 @@ class MixinEmitter extends ClassEmitter {
     private static final Signature NEW_INSTANCE =
       new Signature("newInstance", MIXIN, new Type[]{ Constants.TYPE_OBJECT_ARRAY });
 
-    public MixinEmitter(ClassVisitor v, String className, Class[] classes, int[] route) {
+    public MixinEmitter(ClassVisitor v, String className, Class<?>[] classes, int[] route) {
         super(v);
 
         begin_class(Constants.V1_2,
@@ -57,7 +57,7 @@ class MixinEmitter extends ClassEmitter {
         e.return_value();
         e.end_method();
 
-        Set unique = new HashSet();
+        Set<Object> unique = new HashSet<Object>();
         for (int i = 0; i < classes.length; i++) {
             Method[] methods = getMethods(classes[i]);
             for (int j = 0; j < methods.length; j++) {
@@ -79,11 +79,11 @@ class MixinEmitter extends ClassEmitter {
         end_class();
     }
 
-    protected Class[] getInterfaces(Class[] classes) {
+    protected Class<?>[] getInterfaces(Class<?>[] classes) {
         return classes;
     }
 
-    protected Method[] getMethods(Class type) {
+    protected Method[] getMethods(Class<?> type) {
         return type.getMethods();
     }
 }

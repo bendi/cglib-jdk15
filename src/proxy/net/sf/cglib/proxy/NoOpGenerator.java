@@ -24,8 +24,8 @@ implements CallbackGenerator
 {
     public static final NoOpGenerator INSTANCE = new NoOpGenerator();
 
-    public void generate(ClassEmitter ce, Context context, List methods) {
-        for (Iterator it = methods.iterator(); it.hasNext();) {
+    public void generate(ClassEmitter ce, Context context, List<MethodInfo> methods) {
+        for (Iterator<MethodInfo> it = methods.iterator(); it.hasNext();) {
             MethodInfo method = (MethodInfo)it.next();
             if (TypeUtils.isBridge(method.getModifiers()) || (
                     TypeUtils.isProtected(context.getOriginalModifiers(method)) &&
@@ -39,6 +39,6 @@ implements CallbackGenerator
             }
         }
     }
-    
-    public void generateStatic(CodeEmitter e, Context context, List methods) { }
+
+    public void generateStatic(CodeEmitter e, Context context, List<MethodInfo> methods) { }
 }

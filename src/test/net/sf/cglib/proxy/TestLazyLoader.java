@@ -15,10 +15,9 @@
  */
 package net.sf.cglib.proxy;
 
+import junit.framework.Test;
+import junit.framework.TestSuite;
 import net.sf.cglib.CodeGenTestCase;
-import java.lang.reflect.*;
-import java.util.*;
-import junit.framework.*;
 
 public class TestLazyLoader extends CodeGenTestCase  {
     public void testLazyLoader() {
@@ -35,19 +34,19 @@ public class TestLazyLoader extends CodeGenTestCase  {
     public TestLazyLoader(String testName) {
         super(testName);
     }
-    
+
     public static void main(String[] args) {
         junit.textui.TestRunner.run(suite());
     }
-    
+
     public static Test suite() {
         return new TestSuite(TestLazyLoader.class);
     }
-    
+
     public void perform(ClassLoader loader) throws Throwable {
     }
-    
+
     public void testFailOnMemoryLeak() throws Throwable {
     }
-    
+
 }

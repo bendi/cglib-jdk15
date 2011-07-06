@@ -15,11 +15,23 @@
  */
 package net.sf.cglib.reflect;
 
-import java.lang.reflect.*;
-import java.util.*;
-import net.sf.cglib.core.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import net.sf.cglib.core.AbstractClassGenerator;
+import net.sf.cglib.core.ClassEmitter;
+import net.sf.cglib.core.CodeEmitter;
+import net.sf.cglib.core.Constants;
+import net.sf.cglib.core.EmitUtils;
+import net.sf.cglib.core.Local;
+import net.sf.cglib.core.MethodInfo;
+import net.sf.cglib.core.ProcessArrayCallback;
+import net.sf.cglib.core.ReflectUtils;
+import net.sf.cglib.core.Signature;
+import net.sf.cglib.core.TypeUtils;
+
 import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
 
 abstract public class MulticastDelegate implements Cloneable {
@@ -28,8 +40,8 @@ abstract public class MulticastDelegate implements Cloneable {
     protected MulticastDelegate() {
     }
 
-    public List getTargets() {
-        return new ArrayList(Arrays.asList(targets));
+    public List<Object> getTargets() {
+        return new ArrayList<Object>(Arrays.asList(targets));
     }
 
     abstract public MulticastDelegate add(Object target);
@@ -57,13 +69,13 @@ abstract public class MulticastDelegate implements Cloneable {
 
     abstract public MulticastDelegate newInstance();
 
-    public static MulticastDelegate create(Class iface) {
-        Generator gen = new Generator();
+    public static <T> MulticastDelegate create(Class<T> iface) {
+        Generator<T> gen = new Generator<T>();
         gen.setInterface(iface);
         return gen.create();
     }
 
-    public static class Generator extends AbstractClassGenerator {
+    public static class Generator<T> extends AbstractClassGenerator<MulticastDelegate> {
         private static final Source SOURCE = new Source(MulticastDelegate.class.getName());
         private static final Type MULTICAST_DELEGATE =
           TypeUtils.parseType("net.sf.cglib.reflect.MulticastDelegate");
@@ -74,7 +86,7 @@ abstract public class MulticastDelegate implements Cloneable {
         private static final Signature ADD_HELPER =
           new Signature("addHelper", MULTICAST_DELEGATE, new Type[]{ Constants.TYPE_OBJECT });
 
-        private Class iface;
+        private Class<T> iface;
 
         public Generator() {
             super(SOURCE);
@@ -84,7 +96,7 @@ abstract public class MulticastDelegate implements Cloneable {
             return iface.getClassLoader();
         }
 
-        public void setInterface(Class iface) {
+        public void setInterface(Class<T> iface) {
             this.iface = iface;
         }
 
@@ -158,9 +170,10 @@ abstract public class MulticastDelegate implements Cloneable {
             e.end_method();
         }
 
-        protected Object firstInstance(Class type) {
+        @Override
+        protected MulticastDelegate firstInstance(Class<MulticastDelegate> type) {
             // make a new instance in case first object is used with a long list of targets
-            return ((MulticastDelegate)ReflectUtils.newInstance(type)).newInstance();
+            return ReflectUtils.newInstance(type).newInstance();
         }
     }
 }

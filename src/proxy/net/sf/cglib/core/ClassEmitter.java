@@ -15,16 +15,22 @@
  */
 package net.sf.cglib.core;
 
-import java.io.*;
-import java.util.*;
-import org.objectweb.asm.*;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.objectweb.asm.ClassAdapter;
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.FieldVisitor;
+import org.objectweb.asm.MethodAdapter;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Type;
 
 /**
  * @author Juozas Baliuka, Chris Nokleberg
  */
 public class ClassEmitter extends ClassAdapter {
     private ClassInfo classInfo;
-    private Map fieldInfo;
+    private Map<String, FieldInfo> fieldInfo;
 
     private static int hookCounter;
     private MethodVisitor rawStaticInit;
@@ -43,7 +49,7 @@ public class ClassEmitter extends ClassAdapter {
 
     public void setTarget(ClassVisitor cv) {
         this.cv = cv;
-        fieldInfo = new HashMap();
+        fieldInfo = new HashMap<String, FieldInfo>();
 
         // just to be safe
         staticInit = staticHook = null;
@@ -176,7 +182,7 @@ public class ClassEmitter extends ClassAdapter {
     }
 
     public void declare_field(int access, String name, Type type, Object value) {
-        FieldInfo existing = (FieldInfo)fieldInfo.get(name);
+        FieldInfo existing = fieldInfo.get(name);
         FieldInfo info = new FieldInfo(access, name, type, value);
         if (existing != null) {
             if (!info.equals(existing)) {
@@ -194,19 +200,19 @@ public class ClassEmitter extends ClassAdapter {
     }
 
     FieldInfo getFieldInfo(String name) {
-        FieldInfo field = (FieldInfo)fieldInfo.get(name);
+        FieldInfo field = fieldInfo.get(name);
         if (field == null) {
             throw new IllegalArgumentException("Field " + name + " is not declared in " + getClassType().getClassName());
         }
         return field;
     }
-    
+
     static class FieldInfo {
         int access;
         String name;
         Type type;
         Object value;
-        
+
         public FieldInfo(int access, String name, Type type, Object value) {
             this.access = access;
             this.name = name;
@@ -250,11 +256,11 @@ public class ClassEmitter extends ClassAdapter {
                     TypeUtils.fromInternalNames(interfaces),
                     null); // TODO
     }
-    
+
     public void visitEnd() {
         end_class();
     }
-    
+
     public FieldVisitor visitField(int access,
                                    String name,
                                    String desc,
@@ -263,7 +269,7 @@ public class ClassEmitter extends ClassAdapter {
         declare_field(access, name, Type.getType(desc), value);
         return null; // TODO
     }
-    
+
     public MethodVisitor visitMethod(int access,
                                      String name,
                                      String desc,
@@ -271,6 +277,6 @@ public class ClassEmitter extends ClassAdapter {
                                      String[] exceptions) {
         return begin_method(access,
                             new Signature(name, desc),
-                            TypeUtils.fromInternalNames(exceptions));        
+                            TypeUtils.fromInternalNames(exceptions));
     }
 }

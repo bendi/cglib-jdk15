@@ -11,36 +11,36 @@ import net.sf.cglib.proxy.*;
  * @author  baliuka
  */
 public class Beans implements MethodInterceptor {
-    
+
     private PropertyChangeSupport propertySupport;
-   
+
     public void addPropertyChangeListener(PropertyChangeListener listener) {
-        
+
         propertySupport.addPropertyChangeListener(listener);
-        
+
     }
-    
+
     public void removePropertyChangeListener(PropertyChangeListener listener) {
         propertySupport.removePropertyChangeListener(listener);
     }
-    
-    public static  Object newInstance( Class clazz ){
+
+    public static  <T> T newInstance( Class<T> clazz ){
         try{
             Beans interceptor = new Beans();
-            Enhancer e = new Enhancer();
+            Enhancer<T> e = new Enhancer<T>();
             e.setSuperclass(clazz);
             e.setCallback(interceptor);
-            Object bean = e.create();
+            T bean = e.create();
             interceptor.propertySupport = new PropertyChangeSupport( bean );
             return bean;
         }catch( Throwable e ){
             e.printStackTrace();
             throw new Error(e.getMessage());
         }
-        
+
     }
-    
-    static final Class C[] = new Class[0];
+
+    static final Class<?>[] C = new Class[0];
     static final Object emptyArgs [] = new Object[0];
 
 
@@ -60,21 +60,21 @@ public class Beans implements MethodInterceptor {
             if( name.startsWith("set") &&
                 args.length == 1 &&
                 method.getReturnType() == Void.TYPE ){
-            
+
                 char propName[] = name.substring("set".length()).toCharArray();
-            
+
                 propName[0] = Character.toLowerCase( propName[0] );
                 propertySupport.firePropertyChange( new String( propName ) , null , args[0]);
-            
+
             }
         }
         return retValFromSuper;
     }
-    
+
     public static void main( String args[] ){
-        
+
         Bean  bean =  (Bean)newInstance( Bean.class );
-        
+
         bean.addPropertyChangeListener(
         new PropertyChangeListener(){
             public void propertyChange(PropertyChangeEvent evt){
@@ -82,11 +82,11 @@ public class Beans implements MethodInterceptor {
             }
         }
         );
-        
+
         bean.setSampleProperty("TEST");
-        
-        
+
+
     }
-    
-    
+
+
 }

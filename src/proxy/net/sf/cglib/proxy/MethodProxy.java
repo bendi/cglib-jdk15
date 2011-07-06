@@ -36,15 +36,15 @@ public class MethodProxy {
     private Signature sig1;
     private Signature sig2;
     private CreateInfo createInfo;
-    
+
     private final Object initLock = new Object();
     private volatile FastClassInfo fastClassInfo;
-    
+
     /**
      * For internal use by {@link Enhancer} only; see the {@link net.sf.cglib.reflect.FastMethod} class
      * for similar functionality.
      */
-    public static MethodProxy create(Class c1, Class c2, String desc, String name1, String name2) {
+    public static MethodProxy create(Class<?> c1, Class<?> c2, String desc, String name1, String name2) {
         MethodProxy proxy = new MethodProxy();
         proxy.sig1 = new Signature(name1, desc);
         proxy.sig2 = new Signature(name2, desc);
@@ -54,11 +54,11 @@ public class MethodProxy {
 
     private void init()
     {
-        /* 
+        /*
          * Using a volatile invariant allows us to initialize the FastClass and
          * method index pairs atomically.
-         * 
-         * Double-checked locking is safe with volatile in Java 5.  Before 1.5 this 
+         *
+         * Double-checked locking is safe with volatile in Java 5.  Before 1.5 this
          * code could allow fastClassInfo to be instantiated more than once, which
          * appears to be benign.
          */
@@ -84,25 +84,25 @@ public class MethodProxy {
 
     private static class FastClassInfo
     {
-        FastClass f1;
-        FastClass f2;
+        FastClass<?> f1;
+        FastClass<?> f2;
         int i1;
         int i2;
     }
 
     private static class CreateInfo
     {
-        Class c1;
-        Class c2;
+        Class<?> c1;
+        Class<?> c2;
         NamingPolicy namingPolicy;
         GeneratorStrategy strategy;
         boolean attemptLoad;
-        
-        public CreateInfo(Class c1, Class c2)
+
+        public CreateInfo(Class<?> c1, Class<?> c2)
         {
             this.c1 = c1;
             this.c2 = c2;
-            AbstractClassGenerator fromEnhancer = AbstractClassGenerator.getCurrent();
+            AbstractClassGenerator<?> fromEnhancer = AbstractClassGenerator.getCurrent();
             if (fromEnhancer != null) {
                 namingPolicy = fromEnhancer.getNamingPolicy();
                 strategy = fromEnhancer.getStrategy();
@@ -111,8 +111,8 @@ public class MethodProxy {
         }
     }
 
-    private static FastClass helper(CreateInfo ci, Class type) {
-        FastClass.Generator g = new FastClass.Generator();
+    private static <T> FastClass<T> helper(CreateInfo ci, Class<T> type) {
+        FastClass.Generator<T> g = new FastClass.Generator<T>();
         g.setType(type);
         g.setClassLoader(ci.c2.getClassLoader());
         g.setNamingPolicy(ci.namingPolicy);
@@ -154,13 +154,13 @@ public class MethodProxy {
     }
 
     // For testing
-    FastClass getFastClass() {
+    FastClass<?> getFastClass() {
       init();
       return fastClassInfo.f1;
     }
 
     // For testing
-    FastClass getSuperFastClass() {
+    FastClass<?> getSuperFastClass() {
       init();
       return fastClassInfo.f2;
     }
@@ -173,7 +173,7 @@ public class MethodProxy {
      * @return the MethodProxy instance, or null if no applicable matching method is found
      * @throws IllegalArgumentException if the Class was not created by Enhancer or does not use a MethodInterceptor
      */
-    public static MethodProxy find(Class type, Signature sig) {
+    public static MethodProxy find(Class<?> type, Signature sig) {
         try {
             Method m = type.getDeclaredMethod(MethodInterceptorGenerator.FIND_PROXY_NAME,
                                               MethodInterceptorGenerator.FIND_PROXY_TYPES);

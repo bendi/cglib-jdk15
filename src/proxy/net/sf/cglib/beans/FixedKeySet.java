@@ -17,16 +17,16 @@ package net.sf.cglib.beans;
 
 import java.util.*;
 
-public /* need it for class loading  */ class FixedKeySet extends AbstractSet {
-    private Set set;
+public /* need it for class loading  */ class FixedKeySet extends AbstractSet<String> {
+    private Set<String> set;
     private int size;
 
     public FixedKeySet(String[] keys) {
         size = keys.length;
-        set = Collections.unmodifiableSet(new HashSet(Arrays.asList(keys)));
+        set = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(keys)));
     }
 
-    public Iterator iterator() {
+    public Iterator<String> iterator() {
         return set.iterator();
     }
 

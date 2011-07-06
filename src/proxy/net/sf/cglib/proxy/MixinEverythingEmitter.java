@@ -29,11 +29,13 @@ import org.objectweb.asm.ClassVisitor;
  */
 class MixinEverythingEmitter extends MixinEmitter {
 
-    public MixinEverythingEmitter(ClassVisitor v, String className, Class[] classes) {
+    public MixinEverythingEmitter(ClassVisitor v, String className, Class<?>[] classes) {
         super(v, className, classes, null);
     }
 
-    protected Class[] getInterfaces(Class[] classes) {
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	@Override
+    protected Class<?>[] getInterfaces(Class<?>[] classes) {
         List list = new ArrayList();
         for (int i = 0; i < classes.length; i++) {
             ReflectUtils.addAllInterfaces(classes[i], list);
@@ -41,8 +43,9 @@ class MixinEverythingEmitter extends MixinEmitter {
         return (Class[])list.toArray(new Class[list.size()]);
     }
 
-    protected Method[] getMethods(Class type) {
-        List methods = new ArrayList(Arrays.asList(type.getMethods()));
+    @Override
+    protected Method[] getMethods(Class<?> type) {
+        List<Method> methods = new ArrayList<Method>(Arrays.asList(type.getMethods()));
         CollectionUtils.filter(methods, new RejectModifierPredicate(Modifier.FINAL | Modifier.STATIC));
         return (Method[])methods.toArray(new Method[methods.size()]);
     }

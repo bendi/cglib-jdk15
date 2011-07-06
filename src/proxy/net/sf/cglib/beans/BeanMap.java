@@ -15,11 +15,19 @@
  */
 package net.sf.cglib.beans;
 
-import java.beans.*;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
-import java.util.*;
-import net.sf.cglib.core.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import net.sf.cglib.core.AbstractClassGenerator;
+import net.sf.cglib.core.KeyFactory;
+import net.sf.cglib.core.ReflectUtils;
+
 import org.objectweb.asm.ClassVisitor;
 
 /**
@@ -30,7 +38,7 @@ import org.objectweb.asm.ClassVisitor;
  * supported (the key set is fixed).
  * @author Chris Nokleberg
  */
-abstract public class BeanMap implements Map {
+abstract public class BeanMap implements Map<Object,Object> {
     /**
      * Limit the properties reflected in the key set of the map
      * to readable properties.
@@ -52,24 +60,23 @@ abstract public class BeanMap implements Map {
      * @param bean the JavaBean underlying the map
      * @return a new <code>BeanMap</code> instance
      */
-    public static BeanMap create(Object bean) {
-        Generator gen = new Generator();
+    public static <T> BeanMap create(T bean) {
+        Generator<T> gen = new Generator<T>();
         gen.setBean(bean);
         return gen.create();
     }
 
-    public static class Generator extends AbstractClassGenerator {
+    public static class Generator<T> extends AbstractClassGenerator<BeanMap> {
         private static final Source SOURCE = new Source(BeanMap.class.getName());
 
-        private static final BeanMapKey KEY_FACTORY =
-          (BeanMapKey)KeyFactory.create(BeanMapKey.class, KeyFactory.CLASS_BY_NAME);
+        private static final BeanMapKey KEY_FACTORY = KeyFactory.create(BeanMapKey.class, KeyFactory.CLASS_BY_NAME);
 
         interface BeanMapKey {
-            public Object newInstance(Class type, int require);
+            public Object newInstance(Class<?> type, int require);
         }
 
-        private Object bean;
-        private Class beanClass;
+        private T bean;
+        private Class<T> beanClass;
         private int require;
 
         public Generator() {
@@ -83,10 +90,11 @@ abstract public class BeanMap implements Map {
          * You must call either this method or {@link #setBeanClass} before {@link #create}.
          * @param bean the initial bean
          */
-        public void setBean(Object bean) {
+        @SuppressWarnings("unchecked")
+		public void setBean(T bean) {
             this.bean = bean;
             if (bean != null)
-                beanClass = bean.getClass();
+                beanClass = (Class<T>) bean.getClass();
         }
 
         /**
@@ -94,7 +102,7 @@ abstract public class BeanMap implements Map {
          * You must call either this method or {@link #setBeanClass} before {@link #create}.
          * @param beanClass the class of the bean
          */
-        public void setBeanClass(Class beanClass) {
+        public void setBeanClass(Class<T> beanClass) {
             this.beanClass = beanClass;
         }
 
@@ -119,15 +127,17 @@ abstract public class BeanMap implements Map {
             if (beanClass == null)
                 throw new IllegalArgumentException("Class of bean unknown");
             setNamePrefix(beanClass.getName());
-            return (BeanMap)super.create(KEY_FACTORY.newInstance(beanClass, require));
+            return super.create(KEY_FACTORY.newInstance(beanClass, require));
         }
 
-        public void generateClass(ClassVisitor v) throws Exception {
+        @SuppressWarnings({ "unchecked", "rawtypes" })
+		public void generateClass(ClassVisitor v) throws Exception {
             new BeanMapEmitter(v, getClassName(), beanClass, require);
         }
 
-        protected Object firstInstance(Class type) {
-            return ((BeanMap)ReflectUtils.newInstance(type)).newInstance(bean);
+        @Override
+        protected BeanMap firstInstance(Class<BeanMap> type) {
+            return ReflectUtils.newInstance(type).newInstance(bean);
         }
 
     }
@@ -145,7 +155,7 @@ abstract public class BeanMap implements Map {
      * @param name the name of the JavaBean property
      * @return the type of the property, or null if the property does not exist
      */
-    abstract public Class getPropertyType(String name);
+    abstract public Class<?> getPropertyType(String name);
 
     protected Object bean;
 
@@ -211,8 +221,8 @@ abstract public class BeanMap implements Map {
     }
 
     public boolean containsValue(Object value) {
-        for (Iterator it = keySet().iterator(); it.hasNext();) {
-            Object v = get(it.next());
+        for (Iterator<Object> it = keySet().iterator(); it.hasNext();) {
+        	Object v = get(it.next());
             if (((value == null) && (v == null)) || value.equals(v))
                 return true;
         }
@@ -231,23 +241,24 @@ abstract public class BeanMap implements Map {
         throw new UnsupportedOperationException();
     }
 
-    public void putAll(Map t) {
-        for (Iterator it = t.keySet().iterator(); it.hasNext();) {
-            Object key = it.next();
+    public void putAll(Map<? extends Object,? extends Object> t) {
+        for (Iterator<? extends Object> it = t.keySet().iterator(); it.hasNext();) {
+        	Object key = it.next();
             put(key, t.get(key));
         }
     }
 
-    public boolean equals(Object o) {
+    @SuppressWarnings("unchecked")
+	public boolean equals(Object o) {
         if (o == null || !(o instanceof Map)) {
             return false;
         }
-        Map other = (Map)o;
+        Map<Object,Object> other = (Map<Object,Object>)o;
         if (size() != other.size()) {
             return false;
         }
-        for (Iterator it = keySet().iterator(); it.hasNext();) {
-            Object key = it.next();
+        for (Iterator<Object> it = keySet().iterator(); it.hasNext();) {
+        	Object key = it.next();
             if (!other.containsKey(key)) {
                 return false;
             }
@@ -262,9 +273,9 @@ abstract public class BeanMap implements Map {
 
     public int hashCode() {
         int code = 0;
-        for (Iterator it = keySet().iterator(); it.hasNext();) {
-            Object key = it.next();
-            Object value = get(key);
+        for (Iterator<Object> it = keySet().iterator(); it.hasNext();) {
+        	Object key = it.next();
+        	Object value = get(key);
             code += ((key == null) ? 0 : key.hashCode()) ^
                 ((value == null) ? 0 : value.hashCode());
         }
@@ -272,19 +283,19 @@ abstract public class BeanMap implements Map {
     }
 
     // TODO: optimize
-    public Set entrySet() {
-        HashMap copy = new HashMap();
-        for (Iterator it = keySet().iterator(); it.hasNext();) {
-            Object key = it.next();
+    public Set<Map.Entry<Object, Object>> entrySet() {
+        HashMap<Object,Object> copy = new HashMap<Object,Object>();
+        for (Iterator<Object> it = keySet().iterator(); it.hasNext();) {
+        	Object key = it.next();
             copy.put(key, get(key));
         }
-        return Collections.unmodifiableMap(copy).entrySet();
+        return (Set<Map.Entry<Object, Object>>) Collections.unmodifiableMap(copy).entrySet();
     }
 
-    public Collection values() {
-        Set keys = keySet();
-        List values = new ArrayList(keys.size());
-        for (Iterator it = keys.iterator(); it.hasNext();) {
+    public Collection<Object> values() {
+        Set<Object> keys = keySet();
+        List<Object> values = new ArrayList<Object>(keys.size());
+        for (Iterator<Object> it = keys.iterator(); it.hasNext();) {
             values.add(get(it.next()));
         }
         return Collections.unmodifiableCollection(values);
@@ -297,7 +308,7 @@ abstract public class BeanMap implements Map {
     {
         StringBuffer sb = new StringBuffer();
         sb.append('{');
-        for (Iterator it = keySet().iterator(); it.hasNext();) {
+        for (Iterator<Object> it = keySet().iterator(); it.hasNext();) {
             Object key = it.next();
             sb.append(key);
             sb.append('=');

@@ -15,29 +15,28 @@
  */
 package net.sf.cglib.transform;
 
-import junit.framework.*;
-import net.sf.cglib.core.CodeGenerationException;
+import junit.framework.TestCase;
 
 /**
  * @author baliuka
  * $Id: AbstractTransformTest.java,v 1.8 2004/06/24 21:15:16 herbyderby Exp $
  */
 abstract public class AbstractTransformTest extends TestCase {
-   
-    
+
+
      /** Creates a new instance of AbstractTransformTest */
     public AbstractTransformTest() {
         super(null);
     }
-   
+
     /** Creates a new instance of AbstractTransformTest */
     public AbstractTransformTest(String s) {
        super(s);
     }
-    
+
     protected abstract ClassTransformerFactory getTransformer() throws Exception;
-    
-    public Class transform() throws Exception {
+
+    public Class<?> transform() throws Exception {
         ClassLoader loader =
             new TransformingClassLoader(AbstractTransformTest.class.getClassLoader(),
                                         new ClassFilter(){
@@ -45,7 +44,7 @@ abstract public class AbstractTransformTest extends TestCase {
                                                 return !(name.startsWith("java")
                                                          || name.startsWith("junit")
                                                          || name.endsWith("Exclude"));
-                                            } 
+                                            }
                                         },
                                         getTransformer());
         try {
@@ -56,6 +55,6 @@ abstract public class AbstractTransformTest extends TestCase {
         }
     }
 
-    protected void postProcess(Class c) {
+    protected void postProcess(Class<?> c) {
     }
 }

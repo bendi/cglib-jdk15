@@ -1,6 +1,6 @@
 package net.sf.cglib.proxy;
 
-public class EC1 extends EB implements Comparable{
+public class EC1 extends EB implements Comparable<Object>{
 	private String address;
 	private ED ed;
 

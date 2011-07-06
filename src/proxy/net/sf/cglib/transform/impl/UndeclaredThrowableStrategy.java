@@ -15,9 +15,14 @@
  */
 package net.sf.cglib.transform.impl;
 
-import net.sf.cglib.core.*;
-import net.sf.cglib.transform.*;
-import org.objectweb.asm.Attribute;
+import net.sf.cglib.core.ClassGenerator;
+import net.sf.cglib.core.DefaultGeneratorStrategy;
+import net.sf.cglib.core.GeneratorStrategy;
+import net.sf.cglib.core.TypeUtils;
+import net.sf.cglib.transform.ClassTransformer;
+import net.sf.cglib.transform.MethodFilter;
+import net.sf.cglib.transform.MethodFilterTransformer;
+import net.sf.cglib.transform.TransformingClassGenerator;
 
 /**
  * A {@link GeneratorStrategy} suitable for use with {@link net.sf.cglib.Enhancer} which
@@ -35,11 +40,11 @@ public class UndeclaredThrowableStrategy extends DefaultGeneratorStrategy {
      * <code>Throwable</code>, for example
      * <code>java.lang.reflect.UndeclaredThrowableException.class</code>
      */
-    public UndeclaredThrowableStrategy(Class wrapper) {
+    public UndeclaredThrowableStrategy(Class<?> wrapper) {
         t = new UndeclaredThrowableTransformer(wrapper);
         t = new MethodFilterTransformer(TRANSFORM_FILTER, t);
     }
-    
+
     private static final MethodFilter TRANSFORM_FILTER = new MethodFilter() {
         public boolean accept(int access, String name, String desc, String signature, String[] exceptions) {
             return !TypeUtils.isPrivate(access) && name.indexOf('$') < 0;

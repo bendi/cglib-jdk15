@@ -18,8 +18,8 @@ package net.sf.cglib.proxy;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import net.sf.cglib.core.Signature;
@@ -36,14 +36,14 @@ import org.objectweb.asm.Opcodes;
 /**
  * Uses bytecode reflection to figure out the targets of all bridge methods
  * that use invokespecial, so that we can later rewrite them to use invokevirtual.
- * 
+ *
  * @author sberlin@gmail.com (Sam Berlin)
  */
 class BridgeMethodResolver {
 
-    private final Map/* <Class, Set<Signature> */declToBridge;
+    private final Map<Class<?>, Set<Signature>> declToBridge;
 
-    public BridgeMethodResolver(Map declToBridge) {
+    public BridgeMethodResolver(Map<Class<?>, Set<Signature>> declToBridge) {
         this.declToBridge = declToBridge;
     }
 
@@ -51,12 +51,11 @@ class BridgeMethodResolver {
      * Finds all bridge methods that are being called with invokespecial &
      * returns them.
      */
-    public Map/*<Signature, Signature>*/resolveAll() {
-        Map resolved = new HashMap();
-        for (Iterator entryIter = declToBridge.entrySet().iterator(); entryIter.hasNext(); ) {
-            Map.Entry entry = (Map.Entry)entryIter.next();
-            Class owner = (Class)entry.getKey();
-            Set bridges = (Set)entry.getValue();
+    public Map<Signature, Signature> resolveAll() {
+    	Map<Signature, Signature> resolved = new HashMap<Signature, Signature>();
+    	for(Entry<Class<?>, Set<Signature>> entry : declToBridge.entrySet()) {
+            Class<?> owner = entry.getKey();
+            Set<Signature> bridges = entry.getValue();
             try {
                 new ClassReader(owner.getName())
                   .accept(new BridgedFinder(bridges, resolved),
@@ -67,12 +66,12 @@ class BridgeMethodResolver {
     }
 
     private static class BridgedFinder implements ClassVisitor, MethodVisitor {
-        private Map/*<Signature, Signature>*/ resolved;
-        private Set/*<Signature>*/ eligableMethods;
-        
+        private Map<Signature, Signature> resolved;
+        private Set<Signature> eligableMethods;
+
         private Signature currentMethod = null;
 
-        BridgedFinder(Set eligableMethods, Map resolved) {
+        BridgedFinder(Set<Signature> eligableMethods, Map<Signature, Signature> resolved) {
             this.resolved = resolved;
             this.eligableMethods = eligableMethods;
         }

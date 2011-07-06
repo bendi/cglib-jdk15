@@ -19,7 +19,7 @@ import org.objectweb.asm.Type;
 
 class CallbackInfo
 {
-    public static Type[] determineTypes(Class[] callbackTypes) {
+    public static Type[] determineTypes(Class<?>[] callbackTypes) {
         Type[] types = new Type[callbackTypes.length];
         for (int i = 0; i < types.length; i++) {
             types[i] = determineType(callbackTypes[i]);
@@ -45,10 +45,10 @@ class CallbackInfo
 
     //////////////////// PRIVATE ////////////////////
 
-    private Class cls;
+    private Class<?> cls;
     private CallbackGenerator generator;
     private Type type;
-    
+
     private static final CallbackInfo[] CALLBACKS = {
         new CallbackInfo(NoOp.class, NoOpGenerator.INSTANCE),
         new CallbackInfo(MethodInterceptor.class, MethodInterceptorGenerator.INSTANCE),
@@ -59,7 +59,7 @@ class CallbackInfo
         new CallbackInfo(ProxyRefDispatcher.class, DispatcherGenerator.PROXY_REF_INSTANCE),
     };
 
-    private CallbackInfo(Class cls, CallbackGenerator generator) {
+    private CallbackInfo(Class<?> cls, CallbackGenerator generator) {
         this.cls = cls;
         this.generator = generator;
         type = Type.getType(cls);
@@ -72,8 +72,8 @@ class CallbackInfo
         return determineType(callback.getClass());
     }
 
-    private static Type determineType(Class callbackType) {
-        Class cur = null;
+    private static Type determineType(Class<?> callbackType) {
+        Class<?> cur = null;
         for (int i = 0; i < CALLBACKS.length; i++) {
             CallbackInfo info = CALLBACKS[i];
             if (info.cls.isAssignableFrom(callbackType)) {
@@ -99,5 +99,5 @@ class CallbackInfo
         throw new IllegalStateException("Unknown callback type " + callbackType);
     }
 }
-    
+
 

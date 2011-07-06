@@ -25,8 +25,7 @@ import org.objectweb.asm.Type;
  * @version $Id: ConstructorDelegate.java,v 1.20 2006/03/05 02:43:19 herbyderby Exp $
  */
 abstract public class ConstructorDelegate {
-    private static final ConstructorKey KEY_FACTORY =
-      (ConstructorKey)KeyFactory.create(ConstructorKey.class, KeyFactory.CLASS_BY_NAME);
+    private static final ConstructorKey KEY_FACTORY = KeyFactory.create(ConstructorKey.class, KeyFactory.CLASS_BY_NAME);
 
     interface ConstructorKey {
         public Object newInstance(String declaring, String iface);
@@ -35,37 +34,37 @@ abstract public class ConstructorDelegate {
     protected ConstructorDelegate() {
     }
 
-    public static ConstructorDelegate create(Class targetClass, Class iface) {
-        Generator gen = new Generator();
+    public static <I,C> ConstructorDelegate create(Class<C> targetClass, Class<I> iface) {
+        Generator<I,C> gen = new Generator<I,C>();
         gen.setTargetClass(targetClass);
         gen.setInterface(iface);
         return gen.create();
     }
 
-    public static class Generator extends AbstractClassGenerator {
+    public static class Generator<I,C> extends AbstractClassGenerator<ConstructorDelegate> {
         private static final Source SOURCE = new Source(ConstructorDelegate.class.getName());
         private static final Type CONSTRUCTOR_DELEGATE =
           TypeUtils.parseType("net.sf.cglib.reflect.ConstructorDelegate");
 
-        private Class iface;
-        private Class targetClass;
+        private Class<I> iface;
+        private Class<C> targetClass;
 
         public Generator() {
             super(SOURCE);
         }
 
-        public void setInterface(Class iface) {
+        public void setInterface(Class<I> iface) {
             this.iface = iface;
         }
 
-        public void setTargetClass(Class targetClass) {
+        public void setTargetClass(Class<C> targetClass) {
             this.targetClass = targetClass;
         }
 
         public ConstructorDelegate create() {
             setNamePrefix(targetClass.getName());
             Object key = KEY_FACTORY.newInstance(iface.getName(), targetClass.getName());
-            return (ConstructorDelegate)super.create(key);
+            return super.create(key);
         }
 
         protected ClassLoader getDefaultClassLoader() {
@@ -79,7 +78,7 @@ abstract public class ConstructorDelegate {
             if (!newInstance.getReturnType().isAssignableFrom(targetClass)) {
                 throw new IllegalArgumentException("incompatible return type");
             }
-            final Constructor constructor;
+            final Constructor<?> constructor;
             try {
                 constructor = targetClass.getDeclaredConstructor(newInstance.getParameterTypes());
             } catch (NoSuchMethodException e) {
@@ -107,8 +106,10 @@ abstract public class ConstructorDelegate {
             ce.end_class();
         }
 
-        protected Object firstInstance(Class type) {
+        @Override
+        protected ConstructorDelegate firstInstance(Class<ConstructorDelegate> type) {
             return ReflectUtils.newInstance(type);
         }
+
     }
 }

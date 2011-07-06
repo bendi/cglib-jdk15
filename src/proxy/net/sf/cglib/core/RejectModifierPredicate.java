@@ -17,14 +17,14 @@ package net.sf.cglib.core;
 
 import java.lang.reflect.*;
 
-public class RejectModifierPredicate implements Predicate {
+public class RejectModifierPredicate implements Predicate<Member> {
     private int rejectMask;
 
     public RejectModifierPredicate(int rejectMask) {
         this.rejectMask = rejectMask;
     }
 
-    public boolean evaluate(Object arg) {
-        return (((Member)arg).getModifiers() & rejectMask) == 0;
+    public boolean evaluate(Member arg) {
+        return (arg.getModifiers() & rejectMask) == 0;
     }
 }

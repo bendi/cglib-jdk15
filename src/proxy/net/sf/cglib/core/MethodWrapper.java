@@ -19,14 +19,13 @@ import java.lang.reflect.Method;
 import java.util.*;
 
 public class MethodWrapper {
-    private static final MethodWrapperKey KEY_FACTORY =
-      (MethodWrapperKey)KeyFactory.create(MethodWrapperKey.class);
+    private static final MethodWrapperKey KEY_FACTORY = KeyFactory.create(MethodWrapperKey.class);
 
     /** Internal interface, only public due to ClassLoader issues. */
     public interface MethodWrapperKey {
         public Object newInstance(String name, String[] parameterTypes, String returnType);
     }
-    
+
     private MethodWrapper() {
     }
 
@@ -36,10 +35,10 @@ public class MethodWrapper {
                                        method.getReturnType().getName());
     }
 
-    public static Set createSet(Collection methods) {
-        Set set = new HashSet();
-        for (Iterator it = methods.iterator(); it.hasNext();) {
-            set.add(create((Method)it.next()));
+    public static Set<Object> createSet(Collection<Method> methods) {
+        Set<Object> set = new HashSet<Object>();
+        for(Method method : methods) {
+            set.add(create(method));
         }
         return set;
     }

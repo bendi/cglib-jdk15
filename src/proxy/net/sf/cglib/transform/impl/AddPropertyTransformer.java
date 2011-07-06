@@ -24,7 +24,7 @@ public class AddPropertyTransformer extends ClassEmitterTransformer {
     private final String[] names;
     private final Type[] types;
 
-    public AddPropertyTransformer(Map props) {
+    public AddPropertyTransformer(Map<String, Type> props) {
         int size = props.size();
         names = (String[])props.keySet().toArray(new String[size]);
         types = new Type[size];

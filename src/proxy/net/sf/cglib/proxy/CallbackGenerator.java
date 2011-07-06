@@ -16,12 +16,16 @@
 package net.sf.cglib.proxy;
 
 import java.util.List;
-import net.sf.cglib.core.*;
+
+import net.sf.cglib.core.ClassEmitter;
+import net.sf.cglib.core.CodeEmitter;
+import net.sf.cglib.core.MethodInfo;
+import net.sf.cglib.core.Signature;
 
 interface CallbackGenerator
 {
-    void generate(ClassEmitter ce, Context context, List methods) throws Exception;
-    void generateStatic(CodeEmitter e, Context context, List methods) throws Exception;
+    void generate(ClassEmitter ce, Context context, List<MethodInfo> methods) throws Exception;
+    void generateStatic(CodeEmitter e, Context context, List<MethodInfo> methods) throws Exception;
 
     interface Context
     {

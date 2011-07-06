@@ -15,14 +15,23 @@
  */
 package net.sf.cglib.beans;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.*;
-import net.sf.cglib.core.*;
+
+import net.sf.cglib.core.Block;
+import net.sf.cglib.core.ClassEmitter;
+import net.sf.cglib.core.CodeEmitter;
+import net.sf.cglib.core.Constants;
+import net.sf.cglib.core.EmitUtils;
+import net.sf.cglib.core.Local;
+import net.sf.cglib.core.MethodInfo;
+import net.sf.cglib.core.ReflectUtils;
+import net.sf.cglib.core.Signature;
+import net.sf.cglib.core.TypeUtils;
+
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.Type;
-    
+
 class BulkBeanEmitter extends ClassEmitter {
     private static final Signature GET_PROPERTY_VALUES =
       TypeUtils.parseSignature("void getPropertyValues(Object, Object[])");
@@ -34,13 +43,13 @@ class BulkBeanEmitter extends ClassEmitter {
       TypeUtils.parseType("net.sf.cglib.beans.BulkBean");
     private static final Type BULK_BEAN_EXCEPTION =
       TypeUtils.parseType("net.sf.cglib.beans.BulkBeanException");
-        
+
     public BulkBeanEmitter(ClassVisitor v,
                            String className,
-                           Class target,
+                           Class<?> target,
                            String[] getterNames,
                            String[] setterNames,
-                           Class[] types) {
+                           Class<?>[] types) {
         super(v);
 
         Method[] getters = new Method[getterNames.length];
@@ -54,7 +63,7 @@ class BulkBeanEmitter extends ClassEmitter {
         end_class();
     }
 
-    private void generateGet(final Class target, final Method[] getters) {
+    private void generateGet(final Class<?> target, final Method[] getters) {
         CodeEmitter e = begin_method(Constants.ACC_PUBLIC, GET_PROPERTY_VALUES, null);
         if (getters.length >= 0) {
             e.load_arg(0);
@@ -77,7 +86,7 @@ class BulkBeanEmitter extends ClassEmitter {
         e.end_method();
     }
 
-    private void generateSet(final Class target, final Method[] setters) {
+    private void generateSet(final Class<?> target, final Method[] setters) {
         // setPropertyValues
         CodeEmitter e = begin_method(Constants.ACC_PUBLIC, SET_PROPERTY_VALUES, null);
         if (setters.length > 0) {
@@ -117,11 +126,11 @@ class BulkBeanEmitter extends ClassEmitter {
         }
         e.end_method();
     }
-    
-    private static void validate(Class target,
+
+    private static void validate(Class<?> target,
                                  String[] getters,
                                  String[] setters,
-                                 Class[] types,
+                                 Class<?>[] types,
                                  Method[] getters_out,
                                  Method[] setters_out) {
         int i = -1;

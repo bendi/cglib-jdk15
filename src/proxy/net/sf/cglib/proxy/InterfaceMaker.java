@@ -29,10 +29,10 @@ import org.objectweb.asm.Type;
  * @author Chris Nokleberg
  * @version $Id: InterfaceMaker.java,v 1.4 2006/03/05 02:43:19 herbyderby Exp $
  */
-public class InterfaceMaker extends AbstractClassGenerator
+public class InterfaceMaker extends AbstractClassGenerator<Class<?>>
 {
     private static final Source SOURCE = new Source(InterfaceMaker.class.getName());
-    private Map signatures = new HashMap();
+    private Map<Signature, Type[]> signatures = new HashMap<Signature, Type[]>();
 
     /**
      * Create a new <code>InterfaceMaker</code>. A new <code>InterfaceMaker</code>
@@ -68,7 +68,7 @@ public class InterfaceMaker extends AbstractClassGenerator
      * Object class (e.g. <code>getClass</code>, <code>equals</code>, <code>hashCode</code>).
      * @param class the class containing the methods to add to the interface
      */
-    public void add(Class clazz) {
+    public void add(Class<?> clazz) {
         Method[] methods = clazz.getMethods();
         for (int i = 0; i < methods.length; i++) {
             Method m = methods[i];
@@ -81,16 +81,17 @@ public class InterfaceMaker extends AbstractClassGenerator
     /**
      * Create an interface using the current set of method signatures.
      */
-    public Class create() {
+    public Class<?> create() {
         setUseCache(false);
-        return (Class)super.create(this);
+        return super.create(this);
     }
 
     protected ClassLoader getDefaultClassLoader() {
         return null;
     }
 
-    protected Object firstInstance(Class type) {
+    @Override
+    protected Class<?> firstInstance(@SuppressWarnings("rawtypes") Class type) {
         return type;
     }
 
@@ -102,7 +103,7 @@ public class InterfaceMaker extends AbstractClassGenerator
                        null,
                        null,
                        Constants.SOURCE_FILE);
-        for (Iterator it = signatures.keySet().iterator(); it.hasNext();) {
+        for (Iterator<Signature> it = signatures.keySet().iterator(); it.hasNext();) {
             Signature sig = (Signature)it.next();
             Type[] exceptions = (Type[])signatures.get(sig);
             ce.begin_method(Constants.ACC_PUBLIC | Constants.ACC_ABSTRACT,

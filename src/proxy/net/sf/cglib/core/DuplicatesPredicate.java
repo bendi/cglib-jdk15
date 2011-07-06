@@ -18,10 +18,10 @@ package net.sf.cglib.core;
 import java.lang.reflect.Method;
 import java.util.*;
 
-public class DuplicatesPredicate implements Predicate {
-    private Set unique = new HashSet();
+public class DuplicatesPredicate implements Predicate<Method> {
+    private Set<Object> unique = new HashSet<Object>();
 
-    public boolean evaluate(Object arg) {
-        return unique.add(MethodWrapper.create((Method)arg));
+    public boolean evaluate(Method arg) {
+        return unique.add(MethodWrapper.create(arg));
     }
 }

@@ -24,7 +24,6 @@ import net.sf.cglib.core.ReflectUtils;
 import net.sf.cglib.core.Signature;
 import net.sf.cglib.transform.ClassEmitterTransformer;
 
-import org.objectweb.asm.Attribute;
 import org.objectweb.asm.Type;
 
 /**
@@ -32,10 +31,10 @@ import org.objectweb.asm.Type;
  */
 public class AddInitTransformer extends ClassEmitterTransformer {
     private MethodInfo info;
-    
+
     public AddInitTransformer(Method method) {
         info = ReflectUtils.getMethodInfo(method);
-        
+
         Type[] types = info.getSignature().getArgumentTypes();
         if (types.length != 1 ||
         !types[0].equals(Constants.TYPE_OBJECT) ||
@@ -43,7 +42,7 @@ public class AddInitTransformer extends ClassEmitterTransformer {
             throw new IllegalArgumentException(method + " illegal signature");
         }
     }
-    
+
     public CodeEmitter begin_method(int access, Signature sig, Type[] exceptions) {
         final CodeEmitter emitter = super.begin_method(access, sig, exceptions);
         if (sig.getName().equals(Constants.CONSTRUCTOR_NAME)) {

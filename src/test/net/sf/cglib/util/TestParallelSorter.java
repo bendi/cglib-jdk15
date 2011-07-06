@@ -15,11 +15,16 @@
  */
 package net.sf.cglib.util;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
+
+import junit.framework.Test;
+import junit.framework.TestSuite;
 import net.sf.cglib.CodeGenTestCase;
-import java.io.*;
-import java.lang.reflect.Method;
-import java.util.*;
-import junit.framework.*;
 
 /**
  * @author Chris Nokleberg <a href="mailto:chris@nokleberg.com">chris@nokleberg.com</a>
@@ -57,7 +62,7 @@ public class TestParallelSorter extends CodeGenTestCase {
             assertTrue(data1[i] == data2[i]);
         }
     }
-    
+
     private int[] getIndexes(int len) {
         int[] idx = new int[len];
         for (int i = 0; i < len; i++) {
@@ -69,7 +74,7 @@ public class TestParallelSorter extends CodeGenTestCase {
     private Object[] getTestData() throws IOException {
         InputStream in = getClass().getResourceAsStream("words.txt");
         BufferedReader r = new BufferedReader(new InputStreamReader(in));
-        List list = new ArrayList();
+        List<String> list = new ArrayList<String>();
         String line;
         int c = 0;
         while ((line = r.readLine()) != null) {
@@ -88,19 +93,19 @@ public class TestParallelSorter extends CodeGenTestCase {
     public TestParallelSorter(String testName) {
         super(testName);
     }
-    
+
     public static void main(String[] args) {
         junit.textui.TestRunner.run(suite());
     }
-    
+
     public static Test suite() {
         return new TestSuite(TestParallelSorter.class);
     }
-    
+
     public void perform(ClassLoader loader) throws Throwable {
     }
-    
+
     public void testFailOnMemoryLeak() throws Throwable {
     }
-    
+
 }

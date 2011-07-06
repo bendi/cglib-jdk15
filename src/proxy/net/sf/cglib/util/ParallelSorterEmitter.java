@@ -15,9 +15,14 @@
  */
 package net.sf.cglib.util;
 
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import net.sf.cglib.core.*;
+import net.sf.cglib.core.ClassEmitter;
+import net.sf.cglib.core.CodeEmitter;
+import net.sf.cglib.core.Constants;
+import net.sf.cglib.core.EmitUtils;
+import net.sf.cglib.core.Local;
+import net.sf.cglib.core.Signature;
+import net.sf.cglib.core.TypeUtils;
+
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.Type;
 
@@ -83,7 +88,7 @@ class ParallelSorterEmitter extends ClassEmitter {
             e.load_local(T);
             e.load_arg(1);
             e.array_load(component);
-                
+
             e.load_local(T);
             e.load_arg(1);
 

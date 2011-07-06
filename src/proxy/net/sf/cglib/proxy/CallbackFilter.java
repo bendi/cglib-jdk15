@@ -23,11 +23,11 @@ import java.lang.reflect.Method;
  * the bytecode generated for that method in the subclass, and cannot
  * change for the life of the class.
  */
-public interface CallbackFilter {
+public interface CallbackFilter<T> {
     /**
      * Map a method to a callback.
      * @param method the intercepted method
-     * @return the index into the array of callbacks (as specified by {@link Enhancer#setCallbacks}) to use for the method, 
+     * @return the index into the array of callbacks (as specified by {@link Enhancer#setCallbacks}) to use for the method,
      */
     int accept(Method method);
 

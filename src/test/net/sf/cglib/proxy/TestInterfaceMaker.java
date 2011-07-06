@@ -25,7 +25,7 @@ public class TestInterfaceMaker extends CodeGenTestCase
         InterfaceMaker im = new InterfaceMaker();
         im.add(D1.class);
         im.add(D2.class);
-        Class iface = im.create();
+        Class<?> iface = im.create();
         Method[] methods = iface.getMethods();
         assertTrue(methods.length == 2);
         String name1 = methods[0].getName();
@@ -38,7 +38,7 @@ public class TestInterfaceMaker extends CodeGenTestCase
         InterfaceMaker im = new InterfaceMaker();
         im.add(D1.class);
         im.add(D2.class);
-        Class iface = im.create();
+        Class<?> iface = im.create();
         Object obj = Enhancer.create(Object.class, new Class[]{ iface }, new MethodInterceptor() {
             public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) {
                 return "test";
@@ -51,20 +51,20 @@ public class TestInterfaceMaker extends CodeGenTestCase
     public TestInterfaceMaker(String testName) {
         super(testName);
     }
-    
+
     public static Test suite() {
         return new TestSuite(TestInterfaceMaker.class);
     }
-    
+
     public static void main(String args[]) {
         String[] testCaseName = {TestInterfaceMaker.class.getName()};
         junit.textui.TestRunner.main(testCaseName);
     }
-    
+
     public void perform(ClassLoader loader) throws Throwable {
     }
-    
+
     public void testFailOnMemoryLeak() throws Throwable {
     }
-    
+
 }

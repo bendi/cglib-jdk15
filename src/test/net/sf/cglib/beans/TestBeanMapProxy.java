@@ -24,7 +24,7 @@ import java.util.*;
  */
 public class TestBeanMapProxy extends net.sf.cglib.CodeGenTestCase {
     public void testBeanMap() throws Exception {
-        HashMap identity = new HashMap();
+        HashMap<String, Object> identity = new HashMap<String, Object>();
         Person person = (Person)BeanMapProxy.newInstance(identity, new Class[]{ Person.class });
         person.setName("Chris");
         assertTrue("Chris".equals(person.getName()));
@@ -39,20 +39,20 @@ public class TestBeanMapProxy extends net.sf.cglib.CodeGenTestCase {
     public TestBeanMapProxy(String testName) {
         super(testName);
     }
-    
+
     public static void main(String[] args) {
         junit.textui.TestRunner.run(suite());
     }
-    
+
     public static Test suite() {
         return new TestSuite(TestBeanMapProxy.class);
     }
-    
+
     public void perform(ClassLoader loader) throws Throwable {
       //nothing to test at this time
     }
-    
+
     public void testFailOnMemoryLeak() throws Throwable {
     }
-    
+
 }

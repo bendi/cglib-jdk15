@@ -15,14 +15,13 @@
  */
 package net.sf.cglib.core;
 
-import org.objectweb.asm.Attribute;
 import org.objectweb.asm.Type;
 
 abstract public class MethodInfo {
 
     protected MethodInfo() {
     }
-    
+
     abstract public ClassInfo getClassInfo();
     abstract public int getModifiers();
     abstract public Signature getSignature();

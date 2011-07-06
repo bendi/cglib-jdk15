@@ -15,12 +15,15 @@
  */
 package net.sf.cglib.beans;
 
-import net.sf.cglib.proxy.*;
-import net.sf.cglib.core.Constants;
-import net.sf.cglib.core.ReflectUtils;
 import java.lang.reflect.Method;
-import java.util.*;
-import junit.framework.*;
+import java.util.Map;
+
+import junit.framework.Test;
+import junit.framework.TestSuite;
+import net.sf.cglib.proxy.Callback;
+import net.sf.cglib.proxy.CallbackFilter;
+import net.sf.cglib.proxy.Dispatcher;
+import net.sf.cglib.proxy.Enhancer;
 
 public class TestBeanMap extends net.sf.cglib.CodeGenTestCase {
     public static class TestBean {
@@ -34,7 +37,7 @@ public class TestBeanMap extends net.sf.cglib.CodeGenTestCase {
         public String getFoo() {
             return foo;
         }
-        
+
         public void setFoo(String value) {
             foo = value;
         }
@@ -42,7 +45,7 @@ public class TestBeanMap extends net.sf.cglib.CodeGenTestCase {
         public String getBar() {
             return bar;
         }
-        
+
         public void setBaz(String value) {
             baz = value;
         }
@@ -50,7 +53,7 @@ public class TestBeanMap extends net.sf.cglib.CodeGenTestCase {
         public int getQuud() {
             return quud;
         }
-        
+
         public void setQuud(int value) {
             quud = value;
         }
@@ -58,7 +61,7 @@ public class TestBeanMap extends net.sf.cglib.CodeGenTestCase {
         public int getQuick() {
             return quick;
         }
-        
+
         public void setQuip(int value) {
             quip = value;
         }
@@ -89,7 +92,7 @@ public class TestBeanMap extends net.sf.cglib.CodeGenTestCase {
     }
 
     public void testNoUnderlyingBean() {
-        BeanMap.Generator gen = new BeanMap.Generator();
+        BeanMap.Generator<TestBean> gen = new BeanMap.Generator<TestBean>();
         gen.setBeanClass(TestBean.class);
         BeanMap map = gen.create();
 
@@ -101,15 +104,15 @@ public class TestBeanMap extends net.sf.cglib.CodeGenTestCase {
     }
 
     public void testMixinMapIntoBean() {
-        Object bean = new TestBean();
+    	TestBean bean = new TestBean();
         bean = mixinMapIntoBean(bean);
-        ((TestBean)bean).setFoo("hello");
+        bean.setFoo("hello");
         assertTrue(bean instanceof Map);
         assertTrue(((Map)bean).get("foo").equals("hello"));
     }
 
     public void testRequire() {
-        BeanMap.Generator gen = new BeanMap.Generator();
+        BeanMap.Generator<TestBean> gen = new BeanMap.Generator<TestBean>();
         gen.setBeanClass(TestBean.class);
         gen.setRequire(BeanMap.REQUIRE_GETTER);
         BeanMap map = gen.create();
@@ -118,12 +121,13 @@ public class TestBeanMap extends net.sf.cglib.CodeGenTestCase {
         assertTrue(!map.containsKey("baz"));
     }
 
-    public static Object mixinMapIntoBean(final Object bean) {
-        Enhancer e = new Enhancer();
-        e.setSuperclass(bean.getClass());
+    @SuppressWarnings("unchecked")
+	public static <T> T mixinMapIntoBean(final T bean) {
+        Enhancer<T> e = new Enhancer<T>();
+        e.setSuperclass((Class<T>)bean.getClass());
         e.setInterfaces(new Class[]{ Map.class });
-        final Map map = BeanMap.create(bean);
-        e.setCallbackFilter(new CallbackFilter() {
+        final Map<Object, Object> map = BeanMap.create(bean);
+        e.setCallbackFilter(new CallbackFilter<T>() {
             public int accept(Method method) {
                 return method.getDeclaringClass().equals(Map.class) ? 1 : 0;
             }
@@ -141,7 +145,7 @@ public class TestBeanMap extends net.sf.cglib.CodeGenTestCase {
             }
         });
         return e.create();
-    }    
+    }
 
     // TODO: test different package
     // TODO: test change bean instance
@@ -150,20 +154,20 @@ public class TestBeanMap extends net.sf.cglib.CodeGenTestCase {
     public TestBeanMap(String testName) {
         super(testName);
     }
-    
+
     public static void main(String[] args) {
         junit.textui.TestRunner.run(suite());
     }
-    
+
     public static Test suite() {
         return new TestSuite(TestBeanMap.class);
     }
-    
+
     public void perform(ClassLoader loader) throws Throwable {
         //tested in enhancer test unit
     }
-    
+
     public void testFailOnMemoryLeak() throws Throwable {
     }
-    
+
 }

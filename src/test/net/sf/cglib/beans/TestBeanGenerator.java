@@ -15,21 +15,23 @@
  */
 package net.sf.cglib.beans;
 
-import java.beans.*;
-import java.lang.reflect.Method;
-import junit.framework.*;
+import java.beans.PropertyDescriptor;
+
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 import net.sf.cglib.core.ReflectUtils;
 
 /**
  * @author Juozas Baliuka, Chris Nokleberg
  */
 public class TestBeanGenerator extends TestCase {
-    
+
     public void testSimple() throws Exception {
-        BeanGenerator bg = new BeanGenerator();
+        BeanGenerator<Object> bg = new BeanGenerator<Object>();
         bg.addProperty("sin", Double.TYPE);
         Object bean = bg.create();
-        
+
         PropertyDescriptor[] pds = ReflectUtils.getBeanProperties(bean.getClass());
         assertTrue(pds.length == 1);
         assertTrue(pds[0].getName().equals("sin"));
@@ -37,7 +39,7 @@ public class TestBeanGenerator extends TestCase {
     }
 
     public void testSuperclass() throws Exception {
-        BeanGenerator bg = new BeanGenerator();
+        BeanGenerator<MA> bg = new BeanGenerator<MA>();
         bg.setSuperclass(MA.class);
         bg.addProperty("sin", Double.TYPE);
         Object bean = bg.create();
@@ -49,11 +51,11 @@ public class TestBeanGenerator extends TestCase {
     public TestBeanGenerator(String testName) {
         super(testName);
     }
-    
+
     public static void main(String[] args) {
         junit.textui.TestRunner.run(suite());
     }
-    
+
     public static Test suite() {
         return new TestSuite(TestBeanGenerator.class);
     }

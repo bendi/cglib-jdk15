@@ -17,6 +17,7 @@ package net.sf.cglib.proxy;
 
 import java.util.*;
 import net.sf.cglib.core.*;
+
 import org.objectweb.asm.Type;
 
 class FixedValueGenerator implements CallbackGenerator {
@@ -26,8 +27,8 @@ class FixedValueGenerator implements CallbackGenerator {
     private static final Signature LOAD_OBJECT =
       TypeUtils.parseSignature("Object loadObject()");
 
-    public void generate(ClassEmitter ce, Context context, List methods) {
-        for (Iterator it = methods.iterator(); it.hasNext();) {
+    public void generate(ClassEmitter ce, Context context, List<MethodInfo> methods) {
+        for (Iterator<MethodInfo> it = methods.iterator(); it.hasNext();) {
             MethodInfo method = (MethodInfo)it.next();
             CodeEmitter e = context.beginMethod(ce, method);
             context.emitCallback(e, context.getIndex(method));
@@ -38,5 +39,5 @@ class FixedValueGenerator implements CallbackGenerator {
         }
     }
 
-    public void generateStatic(CodeEmitter e, Context context, List methods) { }
+    public void generateStatic(CodeEmitter e, Context context, List<MethodInfo> methods) { }
 }

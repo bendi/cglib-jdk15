@@ -15,13 +15,15 @@
  */
 package net.sf.cglib.core;
 
-import java.io.*;
-import java.util.*;
-import java.lang.ref.*;
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.WeakHashMap;
+
 import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.Type;
 
 /**
  * Abstract class for all code-generating CGLIB utilities.
@@ -29,11 +31,10 @@ import org.objectweb.asm.Type;
  * customizing the <code>ClassLoader</code>, name of the generated class, and transformations
  * applied before generation.
  */
-abstract public class AbstractClassGenerator
+abstract public class AbstractClassGenerator<T>
 implements ClassGenerator
 {
-    private static final Object NAME_KEY = new Object();
-    private static final ThreadLocal CURRENT = new ThreadLocal();
+    private static final ThreadLocal<Object> CURRENT = new ThreadLocal<Object>();
 
     private GeneratorStrategy strategy = DefaultGeneratorStrategy.INSTANCE;
     private NamingPolicy namingPolicy = DefaultNamingPolicy.INSTANCE;
@@ -47,8 +48,8 @@ implements ClassGenerator
 
     protected static class Source {
         String name;
-        Map cache = new WeakHashMap();
-        Map classNameCache  = new WeakHashMap();
+        Map<ClassLoader, Map<Object, Reference<?>>> cache = new WeakHashMap<ClassLoader, Map<Object, Reference<?>>>();
+        Map<ClassLoader, Set<String>> classNameCache = new WeakHashMap<ClassLoader, Set<String>>();
         public Source(String name) {
             this.name = name;
         }
@@ -69,16 +70,16 @@ implements ClassGenerator
     }
 
     private String getClassName(final ClassLoader loader) {
-        final Set nameCache = getClassNameCache(loader);
-        return namingPolicy.getClassName(namePrefix, source.name, key, new Predicate() {
-            public boolean evaluate(Object arg) {
+        final Set<String> nameCache = getClassNameCache(loader);
+        return namingPolicy.getClassName(namePrefix, source.name, key, new Predicate<String>() {
+            public boolean evaluate(String arg) {
                 return nameCache.contains(arg);
             }
         });
     }
 
-    private Set getClassNameCache(ClassLoader loader) {
-        return (Set)((Map)source.classNameCache.get(loader));
+    private Set<String> getClassNameCache(ClassLoader loader) {
+        return source.classNameCache.get(loader);
     }
 
     /**
@@ -145,8 +146,9 @@ implements ClassGenerator
      * By default an instance of {@see DefaultGeneratorStrategy} is used.
      */
     public void setStrategy(GeneratorStrategy strategy) {
-        if (strategy == null)
+        if (strategy == null) {
             strategy = DefaultGeneratorStrategy.INSTANCE;
+        }
         this.strategy = strategy;
     }
 
@@ -161,7 +163,8 @@ implements ClassGenerator
      * Used internally by CGLIB. Returns the <code>AbstractClassGenerator</code>
      * that is being used to generate a class in the current thread.
      */
-    public static AbstractClassGenerator getCurrent() {
+    @SuppressWarnings("rawtypes")
+	public static AbstractClassGenerator getCurrent() {
         return (AbstractClassGenerator)CURRENT.get();
     }
 
@@ -184,21 +187,22 @@ implements ClassGenerator
 
     abstract protected ClassLoader getDefaultClassLoader();
 
-    protected Class doCreateClass(Object key) {
+	@SuppressWarnings("unchecked")
+	public Class<T> doCreateClass(Object key) {
         try {
-        	Class gen = null;
+        	Class<T> gen = null;
 
             synchronized (source) {
                 ClassLoader loader = getClassLoader();
-                Map cache2 = null;
-                cache2 = (Map)source.cache.get(loader);
+                Map<Object, Reference<?>> cache2 = null;
+                cache2 = source.cache.get(loader);
                 if (cache2 == null) {
-                    cache2 = new HashMap();
-                    source.classNameCache.put(loader, new HashSet<String>());
+                    cache2 = new HashMap<Object, Reference<?>>();
                     source.cache.put(loader, cache2);
+                    source.classNameCache.put(loader, new HashSet<String>());
                 } else if (useCache) {
-                    Reference ref = (Reference)cache2.get(key);
-                    gen = (Class) (( ref == null ) ? null : ref.get());
+                    Reference<?> ref = cache2.get(key);
+                    gen = (Class<T>) (( ref == null ) ? null : ref.get());
                 }
                 if (gen == null) {
                     Object save = CURRENT.get();
@@ -208,7 +212,7 @@ implements ClassGenerator
 
                         if (attemptLoad) {
                             try {
-                                gen = loader.loadClass(getClassName());
+                                gen = (Class<T>)loader.loadClass(getClassName());
                             } catch (ClassNotFoundException e) {
                                 // ignore
                             }
@@ -221,7 +225,7 @@ implements ClassGenerator
                         }
 
                         if (useCache) {
-                            cache2.put(key, new WeakReference(gen));
+                            cache2.put(key, new WeakReference<Object>(gen));
                         }
                         return gen;
                     } finally {
@@ -239,9 +243,9 @@ implements ClassGenerator
         }
     }
 
-    protected Object create(Object key) {
+    protected T create(Object key) {
     	try {
-    		Class clz = doCreateClass(key);
+    		Class<T> clz = doCreateClass(key);
     		return firstInstance(clz);
         } catch (RuntimeException e) {
             throw e;
@@ -252,5 +256,5 @@ implements ClassGenerator
         }
     }
 
-    abstract protected Object firstInstance(Class type) throws Exception;
+    abstract protected T firstInstance(Class<T> type) throws Exception;
 }

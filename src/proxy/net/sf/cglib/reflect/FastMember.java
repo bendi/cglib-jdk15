@@ -17,20 +17,20 @@ package net.sf.cglib.reflect;
 
 import java.lang.reflect.Member;
 
-abstract public class FastMember
+abstract public class FastMember<M extends Member, T>
 {
-    protected FastClass fc;
-    protected Member member;
+    protected FastClass<T> fc;
+    protected M member;
     protected int index;
 
-    protected FastMember(FastClass fc, Member member, int index) {
+    protected FastMember(FastClass<T> fc, M member, int index) {
         this.fc = fc;
         this.member = member;
         this.index = index;
     }
 
-    abstract public Class[] getParameterTypes();
-    abstract public Class[] getExceptionTypes();
+    abstract public Class<?>[] getParameterTypes();
+    abstract public Class<?>[] getExceptionTypes();
 
     public int getIndex() {
         return index;
@@ -40,7 +40,7 @@ abstract public class FastMember
         return member.getName();
     }
 
-    public Class getDeclaringClass() {
+    public Class<T> getDeclaringClass() {
         return fc.getJavaClass();
     }
 
@@ -60,6 +60,6 @@ abstract public class FastMember
         if (o == null || !(o instanceof FastMember)) {
             return false;
         }
-        return member.equals(((FastMember)o).member);
+        return member.equals(((FastMember<?, ?>)o).member);
     }
 }

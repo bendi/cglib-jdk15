@@ -24,27 +24,29 @@ import java.lang.reflect.Modifier;
  *@version $Id: TestInterceptor.java,v 1.3 2004/06/24 21:15:16 herbyderby Exp $
  */
 public class TestInterceptor implements MethodInterceptor, Serializable {
-    String value;
-    
+	private static final long serialVersionUID = 1L;
+
+	String value;
+
     public String getValue() {
         return value;
     }
-     
+
     public TestInterceptor(String ser) {
         value = ser;
     }
-   
+
     public TestInterceptor() {
     }
 
     public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
         System.out.println( method );
-        Throwable e = null;                                                                            
-        boolean invokedSuper = false;                                                                  
+        Throwable e = null;
+        boolean invokedSuper = false;
         Object retValFromSuper = null;
-        if (!Modifier.isAbstract(method.getModifiers()) && 
+        if (!Modifier.isAbstract(method.getModifiers()) &&
             invokeSuper(obj, method, args)) {
-            invokedSuper = true;                                                                        
+            invokedSuper = true;
             try {
                 retValFromSuper = proxy.invokeSuper(obj, args);
             } catch (Throwable t) {
@@ -53,7 +55,7 @@ public class TestInterceptor implements MethodInterceptor, Serializable {
         }
         return afterReturn(obj, method, args, invokedSuper, retValFromSuper, e);
     }
-    
+
     public boolean invokeSuper(Object obj, Method method, Object[] args) throws Throwable {
         return true;
     }
