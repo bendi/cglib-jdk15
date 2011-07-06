@@ -71,7 +71,7 @@ abstract public class StringSwitcher {
         private String[] strings;
         private int[] ints;
         private boolean fixedInput;
-        
+
         public Generator() {
             super(SOURCE);
         }
@@ -145,10 +145,6 @@ abstract public class StringSwitcher {
 
         protected Object firstInstance(Class type) {
             return (StringSwitcher)ReflectUtils.newInstance(type);
-        }
-
-        protected Object nextInstance(Object instance) {
-            return instance;
         }
     }
 }

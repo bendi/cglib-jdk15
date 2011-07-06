@@ -27,7 +27,7 @@ import org.objectweb.asm.Type;
 abstract public class ConstructorDelegate {
     private static final ConstructorKey KEY_FACTORY =
       (ConstructorKey)KeyFactory.create(ConstructorKey.class, KeyFactory.CLASS_BY_NAME);
-    
+
     interface ConstructorKey {
         public Object newInstance(String declaring, String iface);
     }
@@ -109,10 +109,6 @@ abstract public class ConstructorDelegate {
 
         protected Object firstInstance(Class type) {
             return ReflectUtils.newInstance(type);
-        }
-
-        protected Object nextInstance(Object instance) {
-            return instance;
         }
     }
 }

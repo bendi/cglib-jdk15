@@ -48,7 +48,7 @@ import org.objectweb.asm.ClassVisitor;
 abstract public class ParallelSorter extends SorterTemplate {
     protected Object[] a;
     private Comparer comparer;
-    
+
     protected ParallelSorter() {
     }
 
@@ -149,7 +149,7 @@ abstract public class ParallelSorter extends SorterTemplate {
         chooseComparer(index, cmp);
         super.mergeSort(lo, hi - 1);
     }
-    
+
     private void chooseComparer(int index, Comparator cmp) {
         Object array = a[index];
         Class type = array.getClass().getComponentType();
@@ -169,7 +169,7 @@ abstract public class ParallelSorter extends SorterTemplate {
             comparer = new ComparatorComparer((Object[])array, cmp);
         } else {
             comparer = new ObjectComparer((Object[])array);
-        } 
+        }
     }
 
     protected int compare(int i, int j) {
@@ -193,7 +193,7 @@ abstract public class ParallelSorter extends SorterTemplate {
             return cmp.compare(a[i], a[j]);
         }
     }
-    
+
     static class ObjectComparer implements Comparer {
         private Object[] a;
         public ObjectComparer(Object[] a) { this.a = a; }
@@ -227,7 +227,7 @@ abstract public class ParallelSorter extends SorterTemplate {
             return (vi == vj) ? 0 : (vi > vj) ? 1 : -1;
         }
     }
-    
+
     static class DoubleComparer implements Comparer {
         private double[] a;
         public DoubleComparer(double[] a) { this.a = a; }
@@ -282,13 +282,9 @@ abstract public class ParallelSorter extends SorterTemplate {
             }
             new ParallelSorterEmitter(v, getClassName(), arrays);
         }
-        
+
         protected Object firstInstance(Class type) {
             return ((ParallelSorter)ReflectUtils.newInstance(type)).newInstance(arrays);
-        }
-
-        protected Object nextInstance(Object instance) {
-            return ((ParallelSorter)instance).newInstance(arrays);
         }
     }
 }

@@ -152,12 +152,12 @@ abstract public class MethodDelegate {
           TypeUtils.parseType("net.sf.cglib.reflect.MethodDelegate");
         private static final Signature NEW_INSTANCE =
           new Signature("newInstance", METHOD_DELEGATE, new Type[]{ Constants.TYPE_OBJECT });
-        
+
         private Object target;
         private Class targetClass;
         private String methodName;
         private Class iface;
-        
+
         public Generator() {
             super(SOURCE);
         }
@@ -191,10 +191,6 @@ abstract public class MethodDelegate {
 
         protected Object firstInstance(Class type) {
             return ((MethodDelegate)ReflectUtils.newInstance(type)).newInstance(target);
-        }
-
-        protected Object nextInstance(Object instance) {
-            return ((MethodDelegate)instance).newInstance(target);
         }
 
         public void generateClass(ClassVisitor v) throws NoSuchMethodException {
@@ -252,7 +248,7 @@ abstract public class MethodDelegate {
             e.putfield("eqMethod");
             e.return_value();
             e.end_method();
-            
+
             ce.end_class();
         }
     }

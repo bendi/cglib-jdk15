@@ -43,7 +43,7 @@ abstract public class MulticastDelegate implements Cloneable {
     }
 
     public MulticastDelegate remove(Object target) {
-        for (int i = targets.length - 1; i >= 0; i--) { 
+        for (int i = targets.length - 1; i >= 0; i--) {
             if (targets[i].equals(target)) {
                 MulticastDelegate copy = newInstance();
                 copy.targets = new Object[targets.length - 1];
@@ -95,7 +95,7 @@ abstract public class MulticastDelegate implements Cloneable {
 
         public void generateClass(ClassVisitor cv) {
             final MethodInfo method = ReflectUtils.getMethodInfo(ReflectUtils.findInterfaceMethod(iface));
-            
+
             ClassEmitter ce = new ClassEmitter(cv);
             ce.begin_class(Constants.V1_2,
                            Constants.ACC_PUBLIC,
@@ -161,10 +161,6 @@ abstract public class MulticastDelegate implements Cloneable {
         protected Object firstInstance(Class type) {
             // make a new instance in case first object is used with a long list of targets
             return ((MulticastDelegate)ReflectUtils.newInstance(type)).newInstance();
-        }
-
-        protected Object nextInstance(Object instance) {
-            return ((MulticastDelegate)instance).newInstance();
         }
     }
 }

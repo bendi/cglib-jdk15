@@ -24,7 +24,7 @@ import org.objectweb.asm.Type;
 /**
  * Generates classes to handle multi-valued keys, for use in things such as Maps and Sets.
  * Code for <code>equals</code> and <code>hashCode</code> methods follow the
- * the rules laid out in <i>Effective Java</i> by Joshua Bloch. 
+ * the rules laid out in <i>Effective Java</i> by Joshua Bloch.
  * <p>
  * To generate a <code>KeyFactory</code>, you need to supply an interface which
  * describes the structure of the key. The interface should have a
@@ -65,8 +65,8 @@ abstract public class KeyFactory {
       TypeUtils.parseSignature("StringBuffer append(String)");
     private static final Type KEY_FACTORY =
       TypeUtils.parseType("net.sf.cglib.core.KeyFactory");
-    
-    //generated numbers: 
+
+    //generated numbers:
     private final static int PRIMES[] = {
                11,         73,        179,       331,
               521,        787,       1213,      1823,
@@ -81,7 +81,7 @@ abstract public class KeyFactory {
          74391461,  102123817,  140194277, 192456917,
         264202273,  362693231,  497900099, 683510293,
         938313161, 1288102441, 1768288259  };
-    
+
 
     public static final Customizer CLASS_BY_NAME = new Customizer() {
         public void customize(CodeEmitter e, Type type) {
@@ -156,13 +156,9 @@ abstract public class KeyFactory {
             return ReflectUtils.newInstance(type);
         }
 
-        protected Object nextInstance(Object instance) {
-            return instance;
-        }
-
         public void generateClass(ClassVisitor v) {
             ClassEmitter ce = new ClassEmitter(v);
-            
+
             Method newInstance = ReflectUtils.findNewInstance(keyInterface);
             if (!newInstance.getReturnType().equals(Object.class)) {
                 throw new IllegalArgumentException("newInstance method must return Object");
@@ -197,7 +193,7 @@ abstract public class KeyFactory {
             }
             e.return_value();
             e.end_method();
-            
+
             // hash code
             e = ce.begin_method(Constants.ACC_PUBLIC, HASH_CODE, null);
             int hc = (constant != 0) ? constant : PRIMES[(int)(Math.abs(seed) % PRIMES.length)];

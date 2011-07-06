@@ -37,7 +37,7 @@ abstract public class BeanCopier
       new Signature("copy", Type.VOID_TYPE, new Type[]{ Constants.TYPE_OBJECT, Constants.TYPE_OBJECT, CONVERTER });
     private static final Signature CONVERT =
       TypeUtils.parseSignature("Object convert(Object, Class, Object)");
-    
+
     interface BeanCopierKey {
         public Object newInstance(String source, String target, boolean useConverter);
     }
@@ -63,17 +63,17 @@ abstract public class BeanCopier
         }
 
         public void setSource(Class source) {
-            if(!Modifier.isPublic(source.getModifiers())){ 
+            if(!Modifier.isPublic(source.getModifiers())){
                setNamePrefix(source.getName());
             }
             this.source = source;
         }
-        
+
         public void setTarget(Class target) {
-            if(!Modifier.isPublic(target.getModifiers())){ 
+            if(!Modifier.isPublic(target.getModifiers())){
                setNamePrefix(target.getName());
             }
-          
+
             this.target = target;
         }
 
@@ -116,7 +116,7 @@ abstract public class BeanCopier
                 e.load_arg(1);
                 e.checkcast(targetType);
                 e.store_local(targetLocal);
-                e.load_arg(0);                
+                e.load_arg(0);
                 e.checkcast(sourceType);
                 e.store_local(sourceLocal);
             } else {
@@ -162,10 +162,6 @@ abstract public class BeanCopier
 
         protected Object firstInstance(Class type) {
             return ReflectUtils.newInstance(type);
-        }
-
-        protected Object nextInstance(Object instance) {
-            return instance;
         }
     }
 }

@@ -29,14 +29,13 @@ public class BeanGenerator extends AbstractClassGenerator
     private static final Source SOURCE = new Source(BeanGenerator.class.getName());
     private static final BeanGeneratorKey KEY_FACTORY =
       (BeanGeneratorKey)KeyFactory.create(BeanGeneratorKey.class);
-    
+
     interface BeanGeneratorKey {
         public Object newInstance(String superclass, Map props);
     }
 
     private Class superclass;
     private Map props = new HashMap();
-    private boolean classOnly;
 
     public BeanGenerator() {
         super(SOURCE);
@@ -71,22 +70,19 @@ public class BeanGenerator extends AbstractClassGenerator
     }
 
     public Object create() {
-        classOnly = false;
-        return createHelper();
+        return super.create(createKey());
     }
 
     public Object createClass() {
-        classOnly = true;
-        return createHelper();
+        return doCreateClass(createKey());
     }
 
-    private Object createHelper() {
+    private Object createKey() {
         if (superclass != null) {
             setNamePrefix(superclass.getName());
         }
         String superName = (superclass != null) ? superclass.getName() : "java.lang.Object";
-        Object key = KEY_FACTORY.newInstance(superName, props);
-        return super.create(key);
+        return KEY_FACTORY.newInstance(superName, props);
     }
 
     public void generateClass(ClassVisitor v) throws Exception {
@@ -109,20 +105,7 @@ public class BeanGenerator extends AbstractClassGenerator
     }
 
     protected Object firstInstance(Class type) {
-        if (classOnly) {
-            return type;
-        } else {
-            return ReflectUtils.newInstance(type);
-        }
-    }
-
-    protected Object nextInstance(Object instance) {
-        Class protoclass = (instance instanceof Class) ? (Class)instance : instance.getClass();
-        if (classOnly) {
-            return protoclass;
-        } else {
-            return ReflectUtils.newInstance(protoclass);
-        }
+        return ReflectUtils.newInstance(type);
     }
 
     public static void addProperties(BeanGenerator gen, Map props) {

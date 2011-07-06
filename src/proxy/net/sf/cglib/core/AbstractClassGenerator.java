@@ -48,6 +48,7 @@ implements ClassGenerator
     protected static class Source {
         String name;
         Map cache = new WeakHashMap();
+        Map classNameCache  = new WeakHashMap();
         public Source(String name) {
             this.name = name;
         }
@@ -77,7 +78,7 @@ implements ClassGenerator
     }
 
     private Set getClassNameCache(ClassLoader loader) {
-        return (Set)((Map)source.cache.get(loader)).get(NAME_KEY);
+        return (Set)((Map)source.classNameCache.get(loader));
     }
 
     /**
@@ -138,7 +139,7 @@ implements ClassGenerator
     public boolean getAttemptLoad() {
         return attemptLoad;
     }
-    
+
     /**
      * Set the strategy to use to create the bytecode from this generator.
      * By default an instance of {@see DefaultGeneratorStrategy} is used.
@@ -183,28 +184,28 @@ implements ClassGenerator
 
     abstract protected ClassLoader getDefaultClassLoader();
 
-    protected Object create(Object key) {
+    protected Class doCreateClass(Object key) {
         try {
         	Class gen = null;
-        	
+
             synchronized (source) {
                 ClassLoader loader = getClassLoader();
                 Map cache2 = null;
                 cache2 = (Map)source.cache.get(loader);
                 if (cache2 == null) {
                     cache2 = new HashMap();
-                    cache2.put(NAME_KEY, new HashSet());
+                    source.classNameCache.put(loader, new HashSet<String>());
                     source.cache.put(loader, cache2);
                 } else if (useCache) {
                     Reference ref = (Reference)cache2.get(key);
-                    gen = (Class) (( ref == null ) ? null : ref.get()); 
+                    gen = (Class) (( ref == null ) ? null : ref.get());
                 }
                 if (gen == null) {
                     Object save = CURRENT.get();
                     CURRENT.set(this);
                     try {
                         this.key = key;
-                        
+
                         if (attemptLoad) {
                             try {
                                 gen = loader.loadClass(getClassName());
@@ -218,17 +219,30 @@ implements ClassGenerator
                             getClassNameCache(loader).add(className);
                             gen = ReflectUtils.defineClass(className, b, loader);
                         }
-                       
+
                         if (useCache) {
                             cache2.put(key, new WeakReference(gen));
                         }
-                        return firstInstance(gen);
+                        return gen;
                     } finally {
                         CURRENT.set(save);
                     }
                 }
             }
-            return firstInstance(gen);
+            return gen;
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Error e) {
+            throw e;
+        } catch (Exception e) {
+            throw new CodeGenerationException(e);
+        }
+    }
+
+    protected Object create(Object key) {
+    	try {
+    		Class clz = doCreateClass(key);
+    		return firstInstance(clz);
         } catch (RuntimeException e) {
             throw e;
         } catch (Error e) {
@@ -239,5 +253,4 @@ implements ClassGenerator
     }
 
     abstract protected Object firstInstance(Class type) throws Exception;
-    abstract protected Object nextInstance(Object instance) throws Exception;
 }

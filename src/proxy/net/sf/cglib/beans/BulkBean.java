@@ -29,17 +29,17 @@ abstract public class BulkBean
 {
     private static final BulkBeanKey KEY_FACTORY =
       (BulkBeanKey)KeyFactory.create(BulkBeanKey.class);
-    
+
     interface BulkBeanKey {
         public Object newInstance(String target, String[] getters, String[] setters, String[] types);
     }
-    
+
     protected Class target;
     protected String[] getters, setters;
     protected Class[] types;
-    
+
     protected BulkBean() { }
-    
+
     abstract public void getPropertyValues(Object bean, Object[] values);
     abstract public void setPropertyValues(Object bean, Object[] values);
 
@@ -48,15 +48,15 @@ abstract public class BulkBean
         getPropertyValues(bean, values);
         return values;
     }
-    
+
     public Class[] getPropertyTypes() {
         return (Class[])types.clone();
     }
-    
+
     public String[] getGetters() {
         return (String[])getters.clone();
     }
-    
+
     public String[] getSetters() {
         return (String[])setters.clone();
     }
@@ -116,21 +116,17 @@ abstract public class BulkBean
         protected Object firstInstance(Class type) {
             BulkBean instance = (BulkBean)ReflectUtils.newInstance(type);
             instance.target = target;
-                    
+
             int length = getters.length;
             instance.getters = new String[length];
             System.arraycopy(getters, 0, instance.getters, 0, length);
-                    
+
             instance.setters = new String[length];
             System.arraycopy(setters, 0, instance.setters, 0, length);
-                    
+
             instance.types = new Class[types.length];
             System.arraycopy(types, 0, instance.types, 0, types.length);
 
-            return instance;
-        }
-
-        protected Object nextInstance(Object instance) {
             return instance;
         }
     }

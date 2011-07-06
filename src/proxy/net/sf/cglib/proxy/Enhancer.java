@@ -134,7 +134,6 @@ public class Enhancer extends AbstractClassGenerator
     private CallbackFilter filter;
     private Callback[] callbacks;
     private Type[] callbackTypes;
-    private boolean classOnly;
     private Class superclass;
     private Class[] argumentTypes;
     private Object[] arguments;
@@ -252,11 +251,11 @@ public class Enhancer extends AbstractClassGenerator
      * an array of actual callback instances.
      * @param callbackType the type of callback to use for all methods
      * @see #setCallbackTypes
-     */     
+     */
     public void setCallbackType(Class callbackType) {
         setCallbackTypes(new Class[]{ callbackType });
     }
-    
+
     /**
      * Set the array of callback types to use.
      * This may be used instead of {@link #setCallbacks} when calling
@@ -280,9 +279,8 @@ public class Enhancer extends AbstractClassGenerator
      * @return a new instance
      */
     public Object create() {
-        classOnly = false;
         argumentTypes = null;
-        return createHelper();
+        return super.create(createKey(false));
     }
 
     /**
@@ -295,13 +293,12 @@ public class Enhancer extends AbstractClassGenerator
      * @return a new instance
      */
     public Object create(Class[] argumentTypes, Object[] arguments) {
-        classOnly = false;
         if (argumentTypes == null || arguments == null || argumentTypes.length != arguments.length) {
             throw new IllegalArgumentException("Arguments must be non-null and of equal length");
         }
         this.argumentTypes = argumentTypes;
         this.arguments = arguments;
-        return createHelper();
+        return super.create(createKey(false));
     }
 
     /**
@@ -313,8 +310,7 @@ public class Enhancer extends AbstractClassGenerator
      * @see #create(Class[], Object[])
      */
     public Class createClass() {
-        classOnly = true;
-        return (Class)createHelper();
+        return doCreateClass(createKey(true));
     }
 
     /**
@@ -325,7 +321,7 @@ public class Enhancer extends AbstractClassGenerator
         serialVersionUID = sUID;
     }
 
-    private void validate() {
+    private void validate(boolean classOnly) {
         if (classOnly ^ (callbacks == null)) {
             if (classOnly) {
                 throw new IllegalStateException("createClass does not accept callbacks");
@@ -367,20 +363,20 @@ public class Enhancer extends AbstractClassGenerator
         }
     }
 
-    private Object createHelper() {
-        validate();
+    private Object createKey(boolean classOnly) {
+        validate(classOnly);
         if (superclass != null) {
             setNamePrefix(superclass.getName());
         } else if (interfaces != null) {
             setNamePrefix(interfaces[ReflectUtils.findPackageProtected(interfaces)].getName());
         }
-        return super.create(KEY_FACTORY.newInstance((superclass != null) ? superclass.getName() : null,
+        return KEY_FACTORY.newInstance((superclass != null) ? superclass.getName() : null,
                                                     ReflectUtils.getNames(interfaces),
                                                     filter,
                                                     callbackTypes,
                                                     useFactory,
                                                     interceptDuringConstruction,
-                                                    serialVersionUID));
+                                                    serialVersionUID);
     }
 
     protected ClassLoader getDefaultClassLoader() {
@@ -397,7 +393,7 @@ public class Enhancer extends AbstractClassGenerator
         return new Signature("CGLIB$" + sig.getName() + "$" + index,
                              sig.getDescriptor());
     }
-    
+
     /**
      * Finds all of the methods that will be extended by an
      * Enhancer-generated class using the specified superclass and
@@ -532,26 +528,7 @@ public class Enhancer extends AbstractClassGenerator
     }
 
     protected Object firstInstance(Class type) throws Exception {
-        if (classOnly) {
-            return type;
-        } else {
-            return createUsingReflection(type);
-        }
-    }
-
-    protected Object nextInstance(Object instance) {
-        Class protoclass = (instance instanceof Class) ? (Class)instance : instance.getClass();
-        if (classOnly) {
-            return protoclass;
-        } else if (instance instanceof Factory) {
-            if (argumentTypes != null) {
-                return ((Factory)instance).newInstance(argumentTypes, arguments, callbacks);
-            } else {
-                return ((Factory)instance).newInstance(callbacks);
-            }
-        } else {
-            return createUsingReflection(protoclass);
-        }
+        return createUsingReflection(type);
     }
 
     /**
@@ -633,15 +610,15 @@ public class Enhancer extends AbstractClassGenerator
     private Object createUsingReflection(Class type) {
         setThreadCallbacks(type, callbacks);
         try{
-        
+
         if (argumentTypes != null) {
-        	
+
              return ReflectUtils.newInstance(type, argumentTypes, arguments);
-             
+
         } else {
-        	
+
             return ReflectUtils.newInstance(type);
-            
+
         }
         }finally{
          // clear thread callbacks to allow them to be gc'd
@@ -717,8 +694,9 @@ public class Enhancer extends AbstractClassGenerator
             e.return_value();
             e.end_method();
         }
-        if (!classOnly && !seenNull && arguments == null)
-            throw new IllegalArgumentException("Superclass has no null constructors but no arguments were given");
+        // FIXME - find a way to enable it with new design
+//        if (!classOnly && !seenNull && arguments == null)
+//            throw new IllegalArgumentException("Superclass has no null constructors but no arguments were given");
     }
 
     private int[] getCallbackKeys() {
@@ -816,7 +794,7 @@ public class Enhancer extends AbstractClassGenerator
         e.return_value();
         e.end_method();
     }
-    
+
     private void emitNewInstanceCallback(ClassEmitter ce) {
         CodeEmitter e = ce.begin_method(Constants.ACC_PUBLIC, SINGLE_NEW_INSTANCE, null);
         switch (callbackTypes.length) {
@@ -895,7 +873,7 @@ public class Enhancer extends AbstractClassGenerator
                 groups.put(generators[index], group = new ArrayList(methods.size()));
             }
             group.add(method);
-            
+
             // Optimization: build up a map of Class -> bridge methods in class
             // so that we can look up all the bridge methods in one pass for a class.
             if (TypeUtils.isBridge(actualMethod.getModifiers())) {
@@ -904,10 +882,10 @@ public class Enhancer extends AbstractClassGenerator
             	    bridges = new HashSet();
             	    declToBridge.put(actualMethod.getDeclaringClass(), bridges);
             	}
-            	bridges.add(method.getSignature());            	
+            	bridges.add(method.getSignature());
             }
         }
-        
+
         final Map bridgeToTarget = new BridgeMethodResolver(declToBridge).resolveAll();
 
         Set seenGen = new HashSet();
@@ -942,18 +920,18 @@ public class Enhancer extends AbstractClassGenerator
                 Signature bridgeTarget = (Signature)bridgeToTarget.get(method.getSignature());
                 if (bridgeTarget != null) {
                     // TODO: this assumes that the target has wider or the same type
-                    // parameters than the current.  
+                    // parameters than the current.
                     // In reality this should always be true because otherwise we wouldn't
                     // have had a bridge doing an invokespecial.
                     // If it isn't true, we would need to checkcast each argument
                     // against the target's argument types
                     e.invoke_virtual_this(bridgeTarget);
-                    
-                    Type retType = method.getSignature().getReturnType();                    
+
+                    Type retType = method.getSignature().getReturnType();
                     // Not necessary to cast if the target & bridge have
-                    // the same return type. 
+                    // the same return type.
                     // (This conveniently includes void and primitive types,
-                    // which would fail if casted.  It's not possible to 
+                    // which would fail if casted.  It's not possible to
                     // covariant from boxed to unbox (or vice versa), so no having
                     // to box/unbox for bridges).
                     // TODO: It also isn't necessary to checkcast if the return is
@@ -1025,7 +1003,7 @@ public class Enhancer extends AbstractClassGenerator
         e.return_value();
         e.end_method();
     }
-    
+
     private void emitCurrentCallback(CodeEmitter e, int index) {
         e.load_this();
         e.getfield(getCallbackField(index));

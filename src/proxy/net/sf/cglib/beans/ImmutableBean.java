@@ -115,10 +115,5 @@ public class ImmutableBean
         protected Object firstInstance(Class type) {
             return ReflectUtils.newInstance(type, OBJECT_CLASSES, new Object[]{ bean });
         }
-
-        // TODO: optimize
-        protected Object nextInstance(Object instance) {
-            return firstInstance(instance.getClass());
-        }
     }
 }

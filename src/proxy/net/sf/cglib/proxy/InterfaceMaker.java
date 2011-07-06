@@ -89,13 +89,9 @@ public class InterfaceMaker extends AbstractClassGenerator
     protected ClassLoader getDefaultClassLoader() {
         return null;
     }
-    
+
     protected Object firstInstance(Class type) {
         return type;
-    }
-
-    protected Object nextInstance(Object instance) {
-        throw new IllegalStateException("InterfaceMaker does not cache");
     }
 
     public void generateClass(ClassVisitor v) throws Exception {

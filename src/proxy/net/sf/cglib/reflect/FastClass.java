@@ -35,9 +35,9 @@ abstract public class FastClass
     }
 
     public static FastClass create(Class type) {
-    
+
         return create(type.getClassLoader(),type);
-        
+
     }
     public static FastClass create(ClassLoader loader, Class type) {
         Generator gen = new Generator();
@@ -50,7 +50,7 @@ abstract public class FastClass
     {
         private static final Source SOURCE = new Source(FastClass.class.getName());
         private Class type;
-        
+
         public Generator() {
             super(SOURCE);
         }
@@ -58,7 +58,7 @@ abstract public class FastClass
         public void setType(Class type) {
             this.type = type;
         }
-        
+
         public FastClass create() {
             setNamePrefix(type.getName());
             return (FastClass)super.create(type.getName());
@@ -78,11 +78,8 @@ abstract public class FastClass
                                             new Object[]{ this.type });
         }
 
-        protected Object nextInstance(Object instance) {
-            return instance;
-        }
     }
-    
+
     public Object invoke(String name, Class[] parameterTypes, Object obj, Object[] args) throws InvocationTargetException {
         return invoke(getIndex(name, parameterTypes), obj, args);
     }
@@ -94,7 +91,7 @@ abstract public class FastClass
     public Object newInstance(Class[] parameterTypes, Object[] args) throws InvocationTargetException {
         return newInstance(getIndex(parameterTypes), args);
     }
-    
+
     public FastMethod getMethod(Method method) {
         return new FastMethod(this, method);
     }

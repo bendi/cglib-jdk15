@@ -44,7 +44,7 @@ abstract public class BeanMap implements Map {
      * @see BeanMap.Generator#setRequire
      */
     public static final int REQUIRE_SETTER = 2;
-    
+
     /**
      * Helper method to create a new <code>BeanMap</code>.  For finer
      * control over the generated instance, use a new instance of
@@ -67,11 +67,11 @@ abstract public class BeanMap implements Map {
         interface BeanMapKey {
             public Object newInstance(Class type, int require);
         }
-        
+
         private Object bean;
         private Class beanClass;
         private int require;
-        
+
         public Generator() {
             super(SOURCE);
         }
@@ -130,9 +130,6 @@ abstract public class BeanMap implements Map {
             return ((BeanMap)ReflectUtils.newInstance(type)).newInstance(bean);
         }
 
-        protected Object nextInstance(Object instance) {
-            return ((BeanMap)instance).newInstance(bean);
-        }
     }
 
     /**
