@@ -673,7 +673,7 @@ public class Enhancer<T> extends AbstractClassGenerator<T>
      * Helper method to create an intercepted object.
      * For finer control over the generated instance, use a new instance of <code>Enhancer</code>
      * instead of this static method.
-     * @param type class to extend or interface to implement
+     * @param superclass class to extend or interface to implement
      * @param interfaces array of interfaces to implement, or null
      * @param callback the callback to use for all methods
      */
@@ -689,7 +689,7 @@ public class Enhancer<T> extends AbstractClassGenerator<T>
      * Helper method to create an intercepted object.
      * For finer control over the generated instance, use a new instance of <code>Enhancer</code>
      * instead of this static method.
-     * @param type class to extend or interface to implement
+     * @param superclass class to extend or interface to implement
      * @param interfaces array of interfaces to implement, or null
      * @param filter the callback filter to use when generating a new class
      * @param callbacks callback implementations to use for the enhanced object

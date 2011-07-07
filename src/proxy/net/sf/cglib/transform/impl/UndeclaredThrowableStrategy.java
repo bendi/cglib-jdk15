@@ -19,13 +19,14 @@ import net.sf.cglib.core.ClassGenerator;
 import net.sf.cglib.core.DefaultGeneratorStrategy;
 import net.sf.cglib.core.GeneratorStrategy;
 import net.sf.cglib.core.TypeUtils;
+import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.transform.ClassTransformer;
 import net.sf.cglib.transform.MethodFilter;
 import net.sf.cglib.transform.MethodFilterTransformer;
 import net.sf.cglib.transform.TransformingClassGenerator;
 
 /**
- * A {@link GeneratorStrategy} suitable for use with {@link net.sf.cglib.Enhancer} which
+ * A {@link GeneratorStrategy} suitable for use with {@link Enhancer} which
  * causes all undeclared exceptions thrown from within a proxied method to be wrapped
  * in an alternative exception of your choice.
  */
