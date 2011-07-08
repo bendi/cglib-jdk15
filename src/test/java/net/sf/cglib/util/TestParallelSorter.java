@@ -15,10 +15,11 @@
  */
 package net.sf.cglib.util;
 
+import static org.junit.Assert.assertArrayEquals;
+
 import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,10 +32,16 @@ import net.sf.cglib.CodeGenTestCase;
  * @version $Id: TestParallelSorter.java,v 1.4 2004/06/24 21:15:13 herbyderby Exp $
  */
 public class TestParallelSorter extends CodeGenTestCase {
+
+	private String[] data1;
+
+	public void setUp() throws Exception {
+		data1 = getTestData();
+	}
+
     public void testSorts() throws Throwable {
-        Object[] data1 = getTestData();
-        Object[] data2 = copy(data1);
-        Object[] data3 = copy(data1);
+        String[] data2 = copy(data1);
+        String[] data3 = copy(data1);
         int[] idx1 = getIndexes(data1.length);
         int[] idx2 = getIndexes(data1.length);
         int[] idx3 = getIndexes(data1.length);
@@ -42,25 +49,11 @@ public class TestParallelSorter extends CodeGenTestCase {
         ParallelSorter p2 = ParallelSorter.create(new Object[]{ data2, idx2 });
         p1.quickSort(0);
         p2.mergeSort(0);
-        compare(data1, data2);
-        compare(idx1, idx2);
+        assertArrayEquals(data1, data2);
+        assertArrayEquals(idx1, idx2);
         p1.quickSort(1);
-        compare(idx1, idx3);
-        compare(data1, data3);
-    }
-
-    private void compare(Object[] data1, Object[] data2) {
-        assertTrue(data1.length == data2.length);
-        for (int i = 0; i < data1.length; i++) {
-            assertTrue(data1[i].equals(data2[i]));
-        }
-    }
-
-    private void compare(int[] data1, int[] data2) {
-        assertTrue(data1.length == data2.length);
-        for (int i = 0; i < data1.length; i++) {
-            assertTrue(data1[i] == data2[i]);
-        }
+        assertArrayEquals(idx1, idx3);
+        assertArrayEquals(data1, data3);
     }
 
     private int[] getIndexes(int len) {
@@ -71,21 +64,19 @@ public class TestParallelSorter extends CodeGenTestCase {
         return idx;
     }
 
-    private Object[] getTestData() throws IOException {
-        InputStream in = getClass().getResourceAsStream("words.txt");
-        BufferedReader r = new BufferedReader(new InputStreamReader(in));
+    private String[] getTestData() throws IOException {
+        BufferedReader r = new BufferedReader(new FileReader("target/test-classes/words.txt"));
         List<String> list = new ArrayList<String>();
         String line;
         int c = 0;
-        while ((line = r.readLine()) != null) {
+        while ((line = r.readLine()) != null && c++ < 20) {
             list.add(line);
-            if (c++ == 20) break;
         }
-        return list.toArray();
+        return list.toArray(new String[0]);
     }
 
-    private Object[] copy(Object[] data) {
-        Object[] copy = new Object[data.length];
+    private String[] copy(String[] data) {
+    	String[] copy = new String[data.length];
         System.arraycopy(data, 0, copy, 0, data.length);
         return copy;
     }

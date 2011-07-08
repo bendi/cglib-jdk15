@@ -20,7 +20,8 @@ import junit.framework.TestSuite;
 import net.sf.cglib.CodeGenTestCase;
 
 public class TestNoOp extends CodeGenTestCase {
-    private static class Foo {
+	// visibility issues
+    public static class Foo {
         public String toString() {
             return "foo";
         }

@@ -25,19 +25,17 @@ abstract public class TestGenerator extends AbstractClassGenerator<Integer> {
         super(source);
     }
 
+    @Override
     protected ClassLoader getDefaultClassLoader() {
         return null;
     }
 
+    @Override
     protected Integer firstInstance(Class<Integer> type) throws Exception {
         return ReflectUtils.newInstance(type);
     }
 
-    protected Object nextInstance(Object instance) throws Exception {
-        return instance;
-    }
-
-    public Object create() {
+    public Integer create() {
         return create(new Integer(counter++));
     }
 }

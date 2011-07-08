@@ -1,0 +1,98 @@
+<?xml version="1.0"?>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>net.sf.cglib</groupId>
+	<artifactId>cglib</artifactId>
+	<name>Code Generation Library</name>
+	<url>http://cglib.sourceforge.net/</url>
+	<description>Code generation library</description>
+
+	<version>2.2.2</version>
+
+	<properties>
+		<jdk.version>jdk15</jdk.version>
+		<cglib.nodep></cglib.nodep>
+	</properties>
+
+	<licenses>
+		<license>
+			<name>ASF 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	<scm>
+		<connection>git://github.com/bendi/cglib-jdk15.git</connection>
+		<url>http://github.com/bendi/cglib-jdk15.git</url>
+	</scm>
+	<!-- <scm> <connection>scm:cvs:pserver:anonymous@cglib.cvs.sourceforge.net:/cvsroot/cglib:cglib</connection>
+		<url>http://cglib.cvs.sourceforge.net/cglib</url> </scm> -->
+	<dependencies>
+		<dependency>
+			<groupId>asm</groupId>
+			<artifactId>asm</artifactId>
+			<version>3.3.1</version>
+		</dependency>
+		<dependency>
+			<groupId>asm</groupId>
+			<artifactId>asm-util</artifactId>
+			<version>3.3.1</version>
+		</dependency>
+		<dependency>
+			<groupId>ant</groupId>
+			<artifactId>ant</artifactId>
+			<version>1.6.2</version>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.8.2</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>asm</groupId>
+			<artifactId>asm-commons</artifactId>
+			<version>3.3.1</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+	<developers>
+		<developer>
+			<id>baliuka</id>
+			<name>Juozas Baliuka</name>
+		</developer>
+		<developer>
+			<id>herbyderby</id>
+			<name>Chris Nokleberg</name>
+		</developer>
+		<developer>
+			<id>sameb</id>
+			<name>Sam Berlin</name>
+		</developer>
+	</developers>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.9</version>
+				<configuration>
+					<includes>
+						<include>net/sf/cglib/TestAll.java</include>
+					</includes>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.3.2</version>
+				<configuration>
+					<source>1.5</source>
+					<target>1.5</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>

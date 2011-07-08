@@ -24,10 +24,10 @@
     <property name="test.build.home" value="build/test"/>
 
     <property name="dist.home" value="dist"/>
-    <property name="source.home" value="src/proxy"/>
-    <property name="samples.source.home" value="src/proxy/samples"/>
-    <property name="source.test" value="src/test"/>
-    <property name="source.asm" value="../asm-src"/>    
+    <property name="source.home" value="src/main/java"/>
+    <property name="samples.source.home" value="src/main/java/samples"/>
+    <property name="source.test" value="src/test/java"/>
+    <property name="source.asm" value="../asm-src"/>
 
     <property name="compile.target" value="1.5"/>
     <property name="compile.source" value="1.5"/>
@@ -66,11 +66,11 @@
     <mkdir dir="${samples.build.home}/classes"/>
     <mkdir dir="${build.home}/conf"/>
     <mkdir dir="${test.build.home}/classes"/>
-   
- 
+
+
   </target>
 
-  <target depends="prepare" description="Compile shareable components" 
+  <target depends="prepare" description="Compile shareable components"
           name="compile">
     <javac debug="${compile.debug}" deprecation="${compile.deprecation}" destdir="${build.home}/classes" optimize="${compile.optimize}" srcdir="${source.home}"
       target="${compile.target}" bootclasspath="${compile.bootclasspath}" extdirs="${compile.extdirs}" source="${compile.source}">
@@ -79,7 +79,7 @@
     </javac>
   </target>
 
-  <target depends="init" description="Clean build and distribution directories" 
+  <target depends="init" description="Clean build and distribution directories"
           name="clean">
     <delete dir="${build.home}"/>
     <delete dir="${test.build.home}"/>
@@ -87,24 +87,24 @@
     <delete dir="${build.transform}"/>
   </target>
 
-  <target depends="clean,compile" 
-          description="Clean and compile all components" 
+  <target depends="clean,compile"
+          description="Clean and compile all components"
    name="all"/>
 
-  
 
-  <target depends="compile" 
-          description="Create component Javadoc documentation" 
+
+  <target depends="compile"
+          description="Create component Javadoc documentation"
           name="javadoc">
     <mkdir dir="docs/api"/>
-    <javadoc author="true" 
-             bottom="Copyright (c) 2001 - Apache Software Foundation" 
-             destdir="docs" 
+    <javadoc author="true"
+             bottom="Copyright (c) 2001 - Apache Software Foundation"
+             destdir="docs"
              doctitle="${component.title}"
              packagenames="net.sf.cglib.*"
              access="public"
              classpathref="compile.classpath"
-             sourcepathref="javadoc.path" version="true" 
+             sourcepathref="javadoc.path" version="true"
              windowtitle="${component.title} (Version ${component.version})"/>
   </target>
 
@@ -114,7 +114,7 @@
   <target depends="compile" description="Create binary distribution" name="jar">
     <mkdir dir="${dist.home}"/>
     <mkdir dir="${build.home}/src"/>
-    
+
 
     <copy file="LICENSE" todir="${build.home}/classes"/>
     <copy file="NOTICE" todir="${build.home}/classes"/>
@@ -122,7 +122,7 @@
     <jar basedir="${build.home}/classes" jarfile="${dist.home}/${component.name}-${component.version}.jar" >
       <include name="**/*"/>
       <exclude name="samples/**" />
-    </jar> 
+    </jar>
 
     <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask" classpathref="compile.classpath"/>
     <jarjar basedir="${build.home}/classes" jarfile="${dist.home}/${component.name}-nodep-${component.version}.jar" >
@@ -131,19 +131,19 @@
       <rule pattern="org.objectweb.asm.**" result="net.sf.cglib.asm.@1"/>
       <include name="**/*"/>
       <exclude name="samples/**"/>
-    </jarjar> 
+    </jarjar>
   </target>
 
   <target depends="compile,javadoc" description="Create docs and source distribution" name="srcjar">
     <jar basedir="docs" jarfile="${dist.home}/${component.name}-docs-${component.version}.jar" >
       <include name="**/*.html"/>
-      <include name="**/*.css"/> 
+      <include name="**/*.css"/>
       <include name="**/*.php"/>
-      <include name="**/*.js"/> 
+      <include name="**/*.js"/>
       <include name="**/*.pdf"/>
       <include name="**/*.gif"/>
-    </jar> 
-    
+    </jar>
+
     <jar basedir="./" jarfile="${dist.home}/${component.name}-src-${component.version}.jar" >
       <include name="build.xml"/>
       <include name="LICENSE*"/>
@@ -151,31 +151,31 @@
       <include name="README*"/>
       <include name="src/**/*.java"/>
       <include name="src/**/*.properties"/>
-      <include name="src/**/*.xml"/>  
-      <include name="lib/**"/>  
-    </jar>   
+      <include name="src/**/*.xml"/>
+      <include name="lib/**"/>
+    </jar>
   </target>
 
   <target depends="clean,jar,srcjar" description="Create binary, docs and source distributions" name="dist"/>
- 
+
    <target depends="compile" name="compile-samples">
-     <javac debug="${compile.debug}" 
-            deprecation="${compile.deprecation}" 
-            destdir="${samples.build.home}/classes" 
-            optimize="${compile.optimize}" 
+     <javac debug="${compile.debug}"
+            deprecation="${compile.deprecation}"
+            destdir="${samples.build.home}/classes"
+            optimize="${compile.optimize}"
             srcdir="${samples.source.home}">
        <classpath refid="compile.classpath"/>
        <compilerarg compiler="jikes" value="-nowarn"/>
      </javac>
-   </target>  
+   </target>
 
 
-   <target depends="compile-samples" 
-          description="runs samples" 
+   <target depends="compile-samples"
+          description="runs samples"
           name="samples-beans">
-    <java classname="Beans" 
+    <java classname="Beans"
           failonerror="${test.failonerror}"
-          fork="yes" 
+          fork="yes"
           >
 
         <classpath>
@@ -190,12 +190,12 @@
 
 
 
-   <target depends="compile-samples" 
-          description="runs samples" 
+   <target depends="compile-samples"
+          description="runs samples"
           name="samples-trace">
-    <java classname="Trace" 
+    <java classname="Trace"
           failonerror="${test.failonerror}"
-          fork="yes" 
+          fork="yes"
           >
 
         <classpath>
@@ -213,42 +213,42 @@
 
   <target depends="compile,compile-samples"
     name="build-test">
-    <javac debug="${compile.debug}" 
-           deprecation="${compile.deprecation}" 
-           destdir="${test.build.home}/classes" 
-           optimize="${compile.optimize}" 
+    <javac debug="${compile.debug}"
+           deprecation="${compile.deprecation}"
+           destdir="${test.build.home}/classes"
+           optimize="${compile.optimize}"
            srcdir="${source.test}"
          >
-   
+
    <classpath refid="compile.classpath"/>
    <classpath>
    <pathelement path="${build.home}/classes"/>
    <pathelement path="${samples.build.home}/classes" />
-   </classpath> 
+   </classpath>
    <compilerarg compiler="jikes" value="-nowarn"/>
- 
+
    </javac>
-  
+
 
   </target>
 
-  <target depends="init,build-test" 
-          description="runs (junit) unit tests" 
+  <target depends="init,build-test"
+          description="runs (junit) unit tests"
           name="test">
-    <java classname="net.sf.cglib.TestAll" 
+    <java classname="net.sf.cglib.TestAll"
           failonerror="${test.failonerror}"
-          fork="yes" 
+          fork="yes"
           >
 
-  <!-- jvmarg value="-Xrunhprof:heap=all,file=debug.txt"/ --> 
-  <!-- <jvmarg value="-verbose:gc"/> --> 
+  <!-- jvmarg value="-Xrunhprof:heap=all,file=debug.txt"/ -->
+  <!-- <jvmarg value="-verbose:gc"/> -->
   <!-- <jvmarg value="-verbose:class"/> -->
   <!-- <jvmarg value="-Xprof"/> -->
   <!-- <jvmarg value="-server"/> -->
   <!-- <sysproperty key="cglib.debugLocation" value="debug"/> -->
   <!-- <jvmarg value="-Djava.security.policy==java.policy" /> -->
   <!-- <jvmarg value="-Djava.security.manager" />  -->
- 
+
       <arg value="${test.entry}"/>
         <classpath>
           <pathelement path="${build.home}/classes"/>
@@ -256,37 +256,12 @@
           <pathelement path="${classpath}"/>
           <pathelement path="${java.class.path}"/>
           <pathelement path="${source.test}"/>
-          <pathelement path="${samples.build.home}/classes" />      
+          <pathelement path="${samples.build.home}/classes" />
           <fileset dir="./lib">
 		<include name="*.jar"/>
           </fileset>
         </classpath>
     </java>
-  </target>
-
-  <target name="test-transform" depends="build-test">
-    <mkdir dir="${build.transform}"/>
-    <copy todir="${build.transform}" preservelastmodified="yes">
-      <fileset dir="${build.home}/classes"/>
-      <fileset dir="./lib"/>	
-    </copy>
-    <taskdef name="example" classname="net.sf.cglib.transform.impl.ExampleTask">
-      <classpath>
-        <pathelement path="${build.home}/classes"/>
-        <pathelement path="${test.build.home}/classes"/>
-        <fileset dir="./lib">
-          <include name="*.jar"/>
-        </fileset>
-      </classpath>
-    </taskdef>
-    <example fieldsuffix="Cglib" verbose="yes">
-      <fileset dir="${build.transform}" includes="**/*">
-      <!--  <not><depend targetdir="${build.home}/classes"/></not> -->
-      </fileset>
-    	
-      <newproperty name="cglibFoo" type="long"/>
-      <newproperty name="cglibBar" type="Double"/>
-    </example>
   </target>
 
 </project>
