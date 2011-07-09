@@ -126,7 +126,7 @@
 
     <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask" classpathref="compile.classpath"/>
     <jarjar basedir="${build.home}/classes" jarfile="${dist.home}/${component.name}-nodep-${component.version}.jar" >
-      <zipfileset dir="lib" includes="asm*.txt"/>
+      <zipfileset dir="src/main/resources" includes="asm*.txt"/>
       <zipfileset src="lib/asm-3.3.1.jar" excludes="META-INF"/>
       <rule pattern="org.objectweb.asm.**" result="net.sf.cglib.asm.@1"/>
       <include name="**/*"/>

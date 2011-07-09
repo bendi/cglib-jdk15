@@ -2,7 +2,7 @@
 <project
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>net.sf.cglib</groupId>
+	<groupId>cglib</groupId>
 	<artifactId>cglib</artifactId>
 	<name>Code Generation Library</name>
 	<url>http://cglib.sourceforge.net/</url>
@@ -11,8 +11,7 @@
 	<version>2.2.2</version>
 
 	<properties>
-		<jdk.version>jdk15</jdk.version>
-		<cglib.nodep></cglib.nodep>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
 	<licenses>
@@ -93,6 +92,61 @@
 					<target>1.5</target>
 				</configuration>
 			</plugin>
+			<plugin>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<classifier>jdk15</classifier>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
+	<profiles>
+		<profile>
+			<id>cglib-nodep</id>
+			<build>
+				<resources>
+					<resource>
+						<directory>src/main/resources</directory>
+						<includes>
+							<include>asm*.txt</include>
+						</includes>
+					</resource>
+				</resources>
+				<plugins>
+					<plugin>
+						<artifactId>maven-jar-plugin</artifactId>
+						<configuration>
+							<classifier>nodep-jdk15</classifier>
+							<classesDirectory>target/jarjar-classes</classesDirectory>
+						</configuration>
+					</plugin>
+					<plugin>
+						<groupId>org.sonatype.plugins</groupId>
+						<artifactId>jarjar-maven-plugin</artifactId>
+						<executions>
+							<execution>
+								<phase>prepare-package</phase>
+								<goals>
+									<goal>jarjar</goal>
+								</goals>
+								<configuration>
+									<includes>
+										<include>asm:asm</include>
+									</includes>
+									<rules>
+										<rule>
+											<pattern>org.objectweb.asm.**</pattern>
+											<result>net.sf.cglib.asm.@1</result>
+										</rule>
+									</rules>
+									<input>target/classes</input>
+									<output>target/jarjar-classes</output>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>
