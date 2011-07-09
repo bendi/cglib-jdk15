@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="Code Generation Library">
+
+	<skin>
+		<groupId>org.apache.maven.skins</groupId>
+		<artifactId>maven-classic-skin</artifactId>
+		<version>1.0</version>
+	</skin>
+
+	<title>Code Generation Library</title>
+
+	<body>
+		<menu name="Overview">
+			<item name="Project Summary" href="http://sourceforge.net/projects/cglib" />
+			<!-- item name="Features" href="/features.html" / -->
+			<item name="Downloads"
+				href="http://sourceforge.net/project/showfiles.php?group_id=56933" />
+		</menu>
+		<menu name="Documentation">
+			<item name="How To" href="/howto.html" />
+		</menu>
+		<menu name="Samples">
+			<item name="Beans" href="/xref-test/samples/Beans.html" />
+			<item name="JdkCompatibleProxy" href="/xref/net/sf/cglib/proxy/Proxy.html" />
+			<item name="KeySample" href="/xref-test/samples/KeySample.html" />
+			<item name="Trace" href="/xref-test/samples/Trace.html" />
+		</menu>
+		<menu name="Project documentation">
+			<item name="Front Page" />
+			<item name="Project Info" href="./project-info.html" />
+			<item name="Project Reports" href="./maven-reports.html" />
+			<item name="JavaDocs" href="./apidocs/index.html" />
+			<item name="Source XReference" href="./xref/index.html" />
+			<item name="Test XReference" href="./xref-test/index.html" />
+			<item name="Development Process" href="http://maven.apache.org/development-process.html" />
+		</menu>
+
+	</body>
+</project>
