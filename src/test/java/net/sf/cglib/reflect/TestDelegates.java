@@ -62,15 +62,17 @@ public class TestDelegates extends net.sf.cglib.CodeGenTestCase {
 
     public void testEquals() throws Throwable {
         String test = "abc";
-        MethodDelegate mc1 = MethodDelegate.create(test, "indexOf", IndexOf.class);
-        MethodDelegate mc2 = MethodDelegate.create(test, "indexOf", IndexOf.class);
-        MethodDelegate mc3 = MethodDelegate.create("other", "indexOf", IndexOf.class);
-        MethodDelegate mc4 = MethodDelegate.create(test, "substring", Substring.class);
-        MethodDelegate mc5 = MethodDelegate.create(test, "substring", Substring2.class);
-        assertTrue(mc1.equals(mc2));
-        assertTrue(!mc1.equals(mc3));
-        assertTrue(!mc1.equals(mc4));
-        assertTrue(mc4.equals(mc5));
+        IndexOf mc1 = MethodDelegate.create(test, "indexOf", IndexOf.class);
+        IndexOf mc2 = MethodDelegate.create(test, "indexOf", IndexOf.class);
+        IndexOf mc3 = MethodDelegate.create("other", "indexOf", IndexOf.class);
+        Substring mc4 = MethodDelegate.create(test, "substring", Substring.class);
+        Substring2 mc5 = MethodDelegate.create(test, "substring", Substring2.class);
+        assertEquals(mc1, mc2);
+        assertFalse(mc1.equals(mc3));
+        assertFalse(mc1.equals(mc4));
+        assertEquals(mc4, mc5);
+        assertFalse(mc1.equals(null));
+        assertFalse(mc1.equals("string"));
     }
 
     public static interface MainDelegate {

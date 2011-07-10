@@ -115,8 +115,7 @@ import org.objectweb.asm.Type;
  * @version $Id: MethodDelegate.java,v 1.25 2006/03/05 02:43:19 herbyderby Exp $
  */
 abstract public class MethodDelegate {
-    private static final MethodDelegateKey KEY_FACTORY =
-      (MethodDelegateKey)KeyFactory.create(MethodDelegateKey.class, KeyFactory.CLASS_BY_NAME);
+    private static final MethodDelegateKey KEY_FACTORY = KeyFactory.create(MethodDelegateKey.class, KeyFactory.CLASS_BY_NAME);
 
     protected Object target;
     protected String eqMethod;
@@ -125,27 +124,34 @@ abstract public class MethodDelegate {
         Object newInstance(Class<?> delegateClass, String methodName, Class<?> iface);
     }
 
-    public static <I,C> MethodDelegate createStatic(Class<C> targetClass, String methodName, Class<I> iface) {
+    @SuppressWarnings("unchecked")
+	public static <I,C> I createStatic(Class<C> targetClass, String methodName, Class<I> iface) {
         Generator<I,C> gen = new Generator<I,C>();
         gen.setTargetClass(targetClass);
         gen.setMethodName(methodName);
         gen.setInterface(iface);
-        return gen.create();
+        return (I) gen.create();
     }
 
-    public static <I,C> MethodDelegate create(C target, String methodName, Class<I> iface) {
+    @SuppressWarnings("unchecked")
+	public static <I,C> I create(C target, String methodName, Class<I> iface) {
         Generator<I,C> gen = new Generator<I,C>();
         gen.setTarget(target);
         gen.setMethodName(methodName);
         gen.setInterface(iface);
-        return gen.create();
+        return (I) gen.create();
     }
 
+    @Override
     public boolean equals(Object obj) {
+    	if (obj == null || !(obj instanceof MethodDelegate)) {
+    		return false;
+    	}
         MethodDelegate other = (MethodDelegate)obj;
         return target == other.target && eqMethod.equals(other.eqMethod);
     }
 
+    @Override
     public int hashCode() {
         return target.hashCode() ^ eqMethod.hashCode();
     }
@@ -197,7 +203,7 @@ abstract public class MethodDelegate {
         public MethodDelegate create() {
             setNamePrefix(targetClass.getName());
             Object key = KEY_FACTORY.newInstance(targetClass, methodName, iface);
-            return (MethodDelegate)super.create(key);
+            return super.create(key);
         }
 
         @Override
