@@ -127,7 +127,7 @@ abstract public class BeanCopier
             }
             for (int i = 0; i < setters.length; i++) {
                 PropertyDescriptor setter = setters[i];
-                PropertyDescriptor getter = (PropertyDescriptor)names.get(setter.getName());
+                PropertyDescriptor getter = names.get(setter.getName());
                 if (getter != null) {
                     MethodInfo read = ReflectUtils.getMethodInfo(getter.getReadMethod());
                     MethodInfo write = ReflectUtils.getMethodInfo(setter.getWriteMethod());

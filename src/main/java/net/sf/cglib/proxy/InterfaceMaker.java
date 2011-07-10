@@ -78,6 +78,7 @@ public class InterfaceMaker extends AbstractClassGenerator<Class<?>>
         }
     }
 
+    @Override
     protected Object createKey(boolean classOnly) {
         setUseCache(false);
     	return this;

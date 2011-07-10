@@ -34,30 +34,31 @@ import net.sf.cglib.core.TypeUtils;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.Type;
 
-abstract public class MulticastDelegate implements Cloneable {
+abstract public class MulticastDelegate<T> implements Cloneable {
     protected Object[] targets = {};
 
     protected MulticastDelegate() {
     }
 
-    public List<Object> getTargets() {
-        return new ArrayList<Object>(Arrays.asList(targets));
+    @SuppressWarnings("unchecked")
+	public List<T> getTargets() {
+        return new ArrayList<T>(Arrays.asList((T[])targets));
     }
 
-    abstract public MulticastDelegate add(Object target);
+    abstract public MulticastDelegate<T> add(T target);
 
-    protected MulticastDelegate addHelper(Object target) {
-        MulticastDelegate copy = newInstance();
+    protected MulticastDelegate<T> addHelper(T target) {
+        MulticastDelegate<T> copy = newInstance();
         copy.targets = new Object[targets.length + 1];
         System.arraycopy(targets, 0, copy.targets, 0, targets.length);
         copy.targets[targets.length] = target;
         return copy;
     }
 
-    public MulticastDelegate remove(Object target) {
+    public MulticastDelegate<T> remove(T target) {
         for (int i = targets.length - 1; i >= 0; i--) {
             if (targets[i].equals(target)) {
-                MulticastDelegate copy = newInstance();
+                MulticastDelegate<T> copy = newInstance();
                 copy.targets = new Object[targets.length - 1];
                 System.arraycopy(targets, 0, copy.targets, 0, i);
                 System.arraycopy(targets, i + 1, copy.targets, i, targets.length - i - 1);
@@ -67,15 +68,16 @@ abstract public class MulticastDelegate implements Cloneable {
         return this;
     }
 
-    abstract public MulticastDelegate newInstance();
+    abstract public MulticastDelegate<T> newInstance();
 
-    public static <T> MulticastDelegate create(Class<T> iface) {
+    @SuppressWarnings("unchecked")
+	public static <T> MulticastDelegate<T> create(Class<T> iface) {
         Generator<T> gen = new Generator<T>();
         gen.setInterface(iface);
-        return gen.create();
+        return (MulticastDelegate<T>) gen.create();
     }
 
-    public static class Generator<T> extends AbstractClassGenerator<MulticastDelegate> {
+    public static class Generator<T> extends AbstractClassGenerator<MulticastDelegate<?>> {
         private static final Source SOURCE = new Source(MulticastDelegate.class.getName());
         private static final Type MULTICAST_DELEGATE =
           TypeUtils.parseType("net.sf.cglib.reflect.MulticastDelegate");
@@ -171,10 +173,11 @@ abstract public class MulticastDelegate implements Cloneable {
             e.end_method();
         }
 
-        @Override
-        protected MulticastDelegate firstInstance(Class<MulticastDelegate> type) {
+        @SuppressWarnings("unchecked")
+		@Override
+        protected MulticastDelegate<T> firstInstance(Class<MulticastDelegate<?>> type) {
             // make a new instance in case first object is used with a long list of targets
-            return ReflectUtils.newInstance(type).newInstance();
+            return (MulticastDelegate<T>) ReflectUtils.newInstance(type).newInstance();
         }
     }
 }

@@ -28,7 +28,7 @@ public class TestDelegates extends net.sf.cglib.CodeGenTestCase {
     }
 
     public void testConstructor() throws Throwable {
-        StringMaker maker = (StringMaker)ConstructorDelegate.create(String.class, StringMaker.class);
+        StringMaker maker = ConstructorDelegate.create(String.class, StringMaker.class);
         assertTrue("nil".equals(maker.newInstance("vanilla".toCharArray(), 2, 3)));
     }
 
@@ -45,18 +45,18 @@ public class TestDelegates extends net.sf.cglib.CodeGenTestCase {
     }
 
     public void testFancy() throws Throwable {
-        Substring delegate = (Substring)MethodDelegate.create("CGLIB", "substring", Substring.class);
+        Substring delegate = MethodDelegate.create("CGLIB", "substring", Substring.class);
         assertTrue("LI".equals(delegate.substring(2, 4)));
     }
 
     public void testFancyNames() throws Throwable {
-        Substring2 delegate = (Substring2)MethodDelegate.create("CGLIB", "substring", Substring2.class);
+        Substring2 delegate = MethodDelegate.create("CGLIB", "substring", Substring2.class);
         assertTrue("LI".equals(delegate.anyNameAllowed(2, 4)));
     }
 
     public void testFancyTypes() throws Throwable {
         String test = "abcabcabc";
-        IndexOf delegate = (IndexOf)MethodDelegate.create(test, "indexOf", IndexOf.class);
+        IndexOf delegate = MethodDelegate.create(test, "indexOf", IndexOf.class);
         assertTrue(delegate.indexOf("ab", 1) == test.indexOf("ab", 1));
     }
 
@@ -86,10 +86,10 @@ public class TestDelegates extends net.sf.cglib.CodeGenTestCase {
     }
 
     public void testStaticDelegate() throws Throwable {
-        MainDelegate start = (MainDelegate)MethodDelegate.createStatic(MainTest.class,
-                                                                       "alternateMain",
-                                                                       MainDelegate.class);
-        assertTrue(start.main(null) == 7);
+        MainDelegate start = MethodDelegate.createStatic(MainTest.class,
+                                                               "alternateMain",
+                                                               MainDelegate.class);
+        assertEquals(7, start.main(null));
     }
 
     public static interface Listener {
@@ -98,7 +98,7 @@ public class TestDelegates extends net.sf.cglib.CodeGenTestCase {
 
     public static class Publisher {
         public int test = 0;
-        private MulticastDelegate event = MulticastDelegate.create(Listener.class);
+        private MulticastDelegate<Listener> event = MulticastDelegate.create(Listener.class);
         public void addListener(Listener listener) {
             event = event.add(listener);
         }
@@ -141,13 +141,13 @@ public class TestDelegates extends net.sf.cglib.CodeGenTestCase {
                     return 2;
                 }
             };
-        MulticastDelegate multi = MulticastDelegate.create(SuperSimple.class);
+        MulticastDelegate<SuperSimple> multi = MulticastDelegate.create(SuperSimple.class);
         multi = multi.add(ss1);
         multi = multi.add(ss2);
-        assertTrue(((SuperSimple)multi).execute() == 2);
+        assertEquals(2, ((SuperSimple)multi).execute());
         multi = multi.remove(ss1);
         multi = multi.add(ss1);
-        assertTrue(((SuperSimple)multi).execute() == 1);
+        assertEquals(1, ((SuperSimple)multi).execute());
     }
 
     public TestDelegates(String testName) {

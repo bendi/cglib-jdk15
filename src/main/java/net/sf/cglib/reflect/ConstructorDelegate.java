@@ -34,11 +34,12 @@ abstract public class ConstructorDelegate {
     protected ConstructorDelegate() {
     }
 
-    public static <I,C> ConstructorDelegate create(Class<C> targetClass, Class<I> iface) {
+    @SuppressWarnings("unchecked")
+	public static <I,C> I create(Class<C> targetClass, Class<I> iface) {
         Generator<I,C> gen = new Generator<I,C>();
         gen.setTargetClass(targetClass);
         gen.setInterface(iface);
-        return gen.create();
+        return (I) gen.create();
     }
 
     public static class Generator<I,C> extends AbstractClassGenerator<ConstructorDelegate> {
