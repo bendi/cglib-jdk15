@@ -134,7 +134,8 @@ abstract public class Mixin {
             this.delegates = delegates;
         }
 
-        public Mixin create() {
+        @Override
+        protected Object createKey(boolean classOnly) {
             if (classes == null && delegates == null) {
                 throw new IllegalStateException("Either classes or delegates must be set");
             }
@@ -167,7 +168,7 @@ abstract public class Mixin {
             }
             setNamePrefix(classes[ReflectUtils.findPackageProtected(classes)].getName());
 
-            return super.create(KEY_FACTORY.newInstance(style, ReflectUtils.getNames( classes ), route));
+            return KEY_FACTORY.newInstance(style, ReflectUtils.getNames( classes ), route);
         }
 
         public void generateClass(ClassVisitor v) {

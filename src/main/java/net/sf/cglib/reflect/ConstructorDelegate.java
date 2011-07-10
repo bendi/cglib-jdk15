@@ -59,12 +59,12 @@ abstract public class ConstructorDelegate {
 
         public void setTargetClass(Class<C> targetClass) {
             this.targetClass = targetClass;
+            setNamePrefix(targetClass.getName());
         }
 
-        public ConstructorDelegate create() {
-            setNamePrefix(targetClass.getName());
-            Object key = KEY_FACTORY.newInstance(iface.getName(), targetClass.getName());
-            return super.create(key);
+        @Override
+        protected Object createKey(boolean classOnly) {
+        	return KEY_FACTORY.newInstance(iface.getName(), targetClass.getName());
         }
 
         protected ClassLoader getDefaultClassLoader() {

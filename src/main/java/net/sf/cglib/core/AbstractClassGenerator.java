@@ -64,8 +64,9 @@ implements ClassGenerator
     }
 
     final protected String getClassName() {
-        if (className == null)
+        if (className == null) {
             className = getClassName(getClassLoader());
+        }
         return className;
     }
 
@@ -256,5 +257,14 @@ implements ClassGenerator
         }
     }
 
+    public T create() {
+        return create(createKey(false));
+    }
+
+    public Class<T> createClass() {
+        return doCreateClass(createKey(true));
+    }
+
     abstract protected T firstInstance(Class<T> type) throws Exception;
+    abstract protected Object createKey(boolean classOnly);
 }

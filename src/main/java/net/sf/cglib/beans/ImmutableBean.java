@@ -61,10 +61,11 @@ public class ImmutableBean
             return target.getClassLoader();
         }
 
-        public T create() {
+        @Override
+        protected Object createKey(boolean classOnly) {
             String name = target.getName();
             setNamePrefix(name);
-            return super.create(name);
+            return name;
         }
 
         public void generateClass(ClassVisitor v) {

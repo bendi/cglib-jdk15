@@ -46,7 +46,7 @@ abstract public class FastClass<T>
         return gen.create();
     }
 
-    public static class Generator<T> extends AbstractClassGenerator<T>
+    public static class Generator<T> extends AbstractClassGenerator<FastClass<T>>
     {
         private static final Source SOURCE = new Source(FastClass.class.getName());
         private Class<T> type;
@@ -59,10 +59,10 @@ abstract public class FastClass<T>
             this.type = type;
         }
 
-        @SuppressWarnings("unchecked")
-		public FastClass<T> create() {
+        @Override
+        protected Object createKey(boolean classOnly) {
             setNamePrefix(type.getName());
-            return (FastClass<T>)super.create(type.getName());
+        	return type.getName();
         }
 
         protected ClassLoader getDefaultClassLoader() {
@@ -74,8 +74,8 @@ abstract public class FastClass<T>
         }
 
         @Override
-        protected T firstInstance(Class<T> type) {
-            return ReflectUtils.newInstance(type,
+        protected FastClass<T> firstInstance(Class<FastClass<T>> type) {
+            return (FastClass<T>) ReflectUtils.newInstance(type,
                                             new Class[]{ Class.class },
                                             new Object[]{ this.type });
         }

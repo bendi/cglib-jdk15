@@ -269,8 +269,9 @@ abstract public class ParallelSorter extends SorterTemplate {
             this.arrays = arrays;
         }
 
-        public ParallelSorter create() {
-            return super.create(ClassesKey.create(arrays));
+        @Override
+        protected Object createKey(boolean classOnly) {
+        	return ClassesKey.create(arrays);
         }
 
         public void generateClass(ClassVisitor v) throws Exception {

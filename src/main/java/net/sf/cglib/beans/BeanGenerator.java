@@ -68,15 +68,8 @@ public class BeanGenerator<T> extends AbstractClassGenerator<T>
         }
     }
 
-    public Object create() {
-        return super.create(createKey());
-    }
-
-    public Object createClass() {
-        return doCreateClass(createKey());
-    }
-
-    private Object createKey() {
+    @Override
+    protected Object createKey(boolean classOnly) {
         if (superclass != null) {
             setNamePrefix(superclass.getName());
         }

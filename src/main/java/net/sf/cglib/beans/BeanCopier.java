@@ -85,9 +85,9 @@ abstract public class BeanCopier
             return source.getClassLoader();
         }
 
-        public BeanCopier create() {
-            Object key = KEY_FACTORY.newInstance(source.getName(), target.getName(), useConverter);
-            return super.create(key);
+        @Override
+        protected Object createKey(boolean classOnly) {
+        	return KEY_FACTORY.newInstance(source.getName(), target.getName(), useConverter);
         }
 
         public void generateClass(ClassVisitor v) {

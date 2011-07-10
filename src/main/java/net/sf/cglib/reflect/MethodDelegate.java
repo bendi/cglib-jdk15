@@ -200,10 +200,10 @@ abstract public class MethodDelegate {
             return targetClass.getClassLoader();
         }
 
-        public MethodDelegate create() {
-            setNamePrefix(targetClass.getName());
-            Object key = KEY_FACTORY.newInstance(targetClass, methodName, iface);
-            return super.create(key);
+        @Override
+        protected Object createKey(boolean classOnly) {
+        	setNamePrefix(targetClass.getName());
+            return KEY_FACTORY.newInstance(targetClass, methodName, iface);
         }
 
         @Override

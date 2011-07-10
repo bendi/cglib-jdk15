@@ -78,12 +78,9 @@ public class InterfaceMaker extends AbstractClassGenerator<Class<?>>
         }
     }
 
-    /**
-     * Create an interface using the current set of method signatures.
-     */
-    public Class<?> create() {
+    protected Object createKey(boolean classOnly) {
         setUseCache(false);
-        return super.create(this);
+    	return this;
     }
 
     protected ClassLoader getDefaultClassLoader() {

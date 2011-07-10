@@ -99,12 +99,12 @@ abstract public class BulkBean
             return target.getClassLoader();
         }
 
-        public BulkBean create() {
+        @Override
+        protected Object createKey(boolean classOnly) {
             setNamePrefix(target.getName());
             String targetClassName = target.getName();
             String[] typeClassNames = ReflectUtils.getNames(types);
-            Object key = KEY_FACTORY.newInstance(targetClassName, getters, setters, typeClassNames);
-            return super.create(key);
+        	return KEY_FACTORY.newInstance(targetClassName, getters, setters, typeClassNames);
         }
 
         public void generateClass(ClassVisitor v) throws Exception {

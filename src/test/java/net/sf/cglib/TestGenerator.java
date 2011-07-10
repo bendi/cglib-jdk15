@@ -35,7 +35,8 @@ abstract public class TestGenerator extends AbstractClassGenerator<Integer> {
         return ReflectUtils.newInstance(type);
     }
 
-    public Integer create() {
-        return create(new Integer(counter++));
+    @Override
+    protected Object createKey(boolean classOnly) {
+    	return new Integer(counter++);
     }
 }

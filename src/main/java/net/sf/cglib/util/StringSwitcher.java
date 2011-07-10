@@ -107,13 +107,10 @@ abstract public class StringSwitcher {
             return getClass().getClassLoader();
         }
 
-        /**
-         * Generate the <code>StringSwitcher</code>.
-         */
-        public StringSwitcher create() {
+        @Override
+        protected Object createKey(boolean classOnly) {
             setNamePrefix(StringSwitcher.class.getName());
-            Object key = KEY_FACTORY.newInstance(strings, ints, fixedInput);
-            return (StringSwitcher)super.create(key);
+            return KEY_FACTORY.newInstance(strings, ints, fixedInput);
         }
 
         public void generateClass(ClassVisitor v) throws Exception {

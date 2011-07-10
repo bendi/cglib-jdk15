@@ -100,9 +100,10 @@ abstract public class MulticastDelegate implements Cloneable {
             this.iface = iface;
         }
 
-        public MulticastDelegate create() {
+        @Override
+        protected Object createKey(boolean classOnly) {
             setNamePrefix(MulticastDelegate.class.getName());
-            return (MulticastDelegate)super.create(iface.getName());
+            return iface.getName();
         }
 
         public void generateClass(ClassVisitor cv) {

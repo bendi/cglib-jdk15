@@ -139,9 +139,11 @@ abstract public class KeyFactory {
             this.keyInterface = keyInterface;
         }
 
-        public T create() {
-            setNamePrefix(keyInterface.getName());
-            return super.create(keyInterface.getName());
+        @Override
+        protected Object createKey(boolean classOnly) {
+        	String name = keyInterface.getName();
+            setNamePrefix(name);
+            return name;
         }
 
         public void setHashConstant(int constant) {

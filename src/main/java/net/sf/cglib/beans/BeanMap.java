@@ -119,15 +119,13 @@ abstract public class BeanMap implements Map<Object,Object> {
             return beanClass.getClassLoader();
         }
 
-        /**
-         * Create a new instance of the <code>BeanMap</code>. An existing
-         * generated class will be reused if possible.
-         */
-        public BeanMap create() {
-            if (beanClass == null)
+        @Override
+        protected Object createKey(boolean classOnly) {
+            if (beanClass == null) {
                 throw new IllegalArgumentException("Class of bean unknown");
+            }
             setNamePrefix(beanClass.getName());
-            return super.create(KEY_FACTORY.newInstance(beanClass, require));
+        	return KEY_FACTORY.newInstance(beanClass, require);
         }
 
         @SuppressWarnings({ "unchecked", "rawtypes" })

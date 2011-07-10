@@ -306,9 +306,10 @@ public class Enhancer<T> extends AbstractClassGenerator<T>
      * Uses the no-arg constructor of the superclass.
      * @return a new instance
      */
+    @Override
     public T create() {
         argumentTypes = null;
-        return super.create(createKey(false));
+        return super.create();
     }
 
     /**
@@ -326,19 +327,7 @@ public class Enhancer<T> extends AbstractClassGenerator<T>
         }
         this.argumentTypes = argumentTypes;
         this.arguments = arguments;
-        return super.create(createKey(false));
-    }
-
-    /**
-     * Generate a new class if necessary and return it without creating a new instance.
-     * This ignores any callbacks that have been set.
-     * To create a new instance you will have to use reflection, and methods
-     * called during the constructor will not be intercepted. To avoid this problem,
-     * use the multi-arg <code>create</code> method.
-     * @see #create(Class[], Object[])
-     */
-    public Class<T> createClass() {
-        return doCreateClass(createKey(true));
+        return super.create();
     }
 
     /**
@@ -391,7 +380,8 @@ public class Enhancer<T> extends AbstractClassGenerator<T>
         }
     }
 
-    private Object createKey(boolean classOnly) {
+    @Override
+    protected Object createKey(boolean classOnly) {
         validate(classOnly);
         if (superclass != null) {
             setNamePrefix(superclass.getName());
