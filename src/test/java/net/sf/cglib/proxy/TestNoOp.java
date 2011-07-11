@@ -22,6 +22,7 @@ import net.sf.cglib.CodeGenTestCase;
 public class TestNoOp extends CodeGenTestCase {
 	// visibility issues
     public static class Foo {
+        @Override
         public String toString() {
             return "foo";
         }
@@ -44,6 +45,7 @@ public class TestNoOp extends CodeGenTestCase {
         return new TestSuite(TestNoOp.class);
     }
 
+    @Override
     public void perform(ClassLoader loader) throws Throwable {
     }
 

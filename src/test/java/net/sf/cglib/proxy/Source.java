@@ -21,6 +21,7 @@ public abstract class Source implements java.io.Serializable{
     public static class CheckedException extends Exception{	private static final long serialVersionUID = -3396864428269221913L;}
     public static class UndeclaredException extends Exception{	private static final long serialVersionUID = -3396864428269221913L;}
 
+    @Override
  public String toString(){
    return "";
  }

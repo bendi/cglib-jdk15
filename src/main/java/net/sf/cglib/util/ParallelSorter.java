@@ -173,6 +173,7 @@ abstract public class ParallelSorter extends SorterTemplate {
         }
     }
 
+    @Override
     protected int compare(int i, int j) {
         return comparer.compare(i, j);
     }
@@ -261,6 +262,7 @@ abstract public class ParallelSorter extends SorterTemplate {
             super(SOURCE);
         }
 
+        @Override
         protected ClassLoader getDefaultClassLoader() {
             return null; // TODO
         }

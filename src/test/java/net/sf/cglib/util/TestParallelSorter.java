@@ -35,6 +35,7 @@ public class TestParallelSorter extends CodeGenTestCase {
 
 	private String[] data1;
 
+    @Override
 	public void setUp() throws Exception {
 		data1 = getTestData();
 	}
@@ -93,6 +94,7 @@ public class TestParallelSorter extends CodeGenTestCase {
         return new TestSuite(TestParallelSorter.class);
     }
 
+    @Override
     public void perform(ClassLoader loader) throws Throwable {
     }
 

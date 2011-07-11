@@ -110,6 +110,7 @@ abstract public class Mixin {
             super(SOURCE);
         }
 
+        @Override
         protected ClassLoader getDefaultClassLoader() {
             return classes[0].getClassLoader(); // is this right?
         }

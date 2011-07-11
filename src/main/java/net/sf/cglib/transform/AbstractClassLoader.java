@@ -47,6 +47,7 @@ abstract public class AbstractClassLoader extends ClassLoader {
         this.classPath = classPath;
     }
 
+    @Override
     public Class<?> loadClass(String name) throws ClassNotFoundException {
 
         Class<?> loaded = findLoadedClass(name);

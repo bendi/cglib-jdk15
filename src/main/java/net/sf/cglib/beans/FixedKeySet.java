@@ -26,10 +26,12 @@ public /* need it for class loading  */ class FixedKeySet extends AbstractSet<St
         set = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(keys)));
     }
 
+    @Override
     public Iterator<String> iterator() {
         return set.iterator();
     }
 
+    @Override
     public int size() {
         return size;
     }

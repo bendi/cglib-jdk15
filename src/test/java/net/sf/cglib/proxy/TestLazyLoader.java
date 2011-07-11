@@ -42,6 +42,7 @@ public class TestLazyLoader extends CodeGenTestCase  {
     public static Test suite() {
         return new TestSuite(TestLazyLoader.class);
     }
+    @Override
 
     public void perform(ClassLoader loader) throws Throwable {
     }

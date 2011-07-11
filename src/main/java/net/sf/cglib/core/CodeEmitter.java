@@ -82,18 +82,22 @@ public class CodeEmitter extends LocalVariablesSorter {
             argumentTypes = sig.getArgumentTypes();
         }
 
+        @Override
         public ClassInfo getClassInfo() {
             return classInfo;
         }
 
+        @Override
         public int getModifiers() {
             return access;
         }
 
+        @Override
         public Signature getSignature() {
             return sig;
         }
 
+        @Override
         public Type[] getExceptionTypes() {
             return exceptionTypes;
         }
@@ -832,6 +836,7 @@ public class CodeEmitter extends LocalVariablesSorter {
         }
     }
 
+    @Override
     public void visitMaxs(int maxStack, int maxLocals) {
         if (!TypeUtils.isAbstract(state.access)) {
             mv.visitMaxs(0, 0);

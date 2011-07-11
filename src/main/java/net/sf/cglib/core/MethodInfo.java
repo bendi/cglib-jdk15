@@ -27,6 +27,7 @@ abstract public class MethodInfo {
     abstract public Signature getSignature();
     abstract public Type[] getExceptionTypes();
 
+    @Override
     public boolean equals(Object o) {
         if (o == null)
             return false;
@@ -35,10 +36,12 @@ abstract public class MethodInfo {
         return getSignature().equals(((MethodInfo)o).getSignature());
     }
 
+    @Override
     public int hashCode() {
         return getSignature().hashCode();
     }
 
+    @Override
     public String toString() {
         // TODO: include modifiers, exceptions
         return getSignature().toString();

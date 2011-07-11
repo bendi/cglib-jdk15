@@ -37,6 +37,7 @@ public class BulkBeanException extends RuntimeException
         return index;
     }
 
+    @Override
     public Throwable getCause() {
         return cause;
     }

@@ -47,6 +47,7 @@ public class DebuggingClassWriter extends ClassWriter {
         super(flags);
     }
 
+    @Override
     public void visit(int version,
                       int access,
                       String name,
@@ -66,6 +67,7 @@ public class DebuggingClassWriter extends ClassWriter {
         return superName;
     }
 
+    @Override
     public byte[] toByteArray() {
 
       return java.security.AccessController.doPrivileged(

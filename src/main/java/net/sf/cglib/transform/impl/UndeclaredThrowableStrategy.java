@@ -52,6 +52,7 @@ public class UndeclaredThrowableStrategy extends DefaultGeneratorStrategy {
         }
     };
 
+    @Override
     protected ClassGenerator transform(ClassGenerator cg) throws Exception {
         return new TransformingClassGenerator(cg, t);
     }

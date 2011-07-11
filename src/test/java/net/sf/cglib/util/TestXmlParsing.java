@@ -175,7 +175,7 @@ public class TestXmlParsing extends CodeGenTestCase {
         }
         return -1;
     }
-    
+
     public int elseIf(String s) {
         if (s.equals(ATTRIBUTE_STR)) {
             return ATTRIBUTE_IDX;
@@ -280,19 +280,20 @@ public class TestXmlParsing extends CodeGenTestCase {
     public TestXmlParsing(String testName) {
         super(testName);
     }
-    
+
     public static void main(String[] args) {
         junit.textui.TestRunner.run(suite());
     }
-    
+
     public static Test suite() {
         return new TestSuite(TestXmlParsing.class);
     }
-    
+
+    @Override
     public void perform(ClassLoader loader) throws Throwable {
     }
-    
+
     public void testFailOnMemoryLeak() throws Throwable {
     }
-    
+
 }

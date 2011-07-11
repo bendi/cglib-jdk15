@@ -57,6 +57,7 @@ public class ImmutableBean
             target = (Class<T>)bean.getClass();
         }
 
+        @Override
         protected ClassLoader getDefaultClassLoader() {
             return target.getClassLoader();
         }

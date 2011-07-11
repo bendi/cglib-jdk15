@@ -152,6 +152,7 @@ public class TestKeyFactory extends net.sf.cglib.CodeGenTestCase {
         return new TestSuite(TestKeyFactory.class);
     }
 
+    @Override
     public void perform(ClassLoader loader) throws Throwable {
 
         KeyFactory.create(loader, MyKey.class, null );

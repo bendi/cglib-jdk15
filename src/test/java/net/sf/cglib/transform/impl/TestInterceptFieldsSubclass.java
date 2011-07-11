@@ -39,6 +39,8 @@ public class TestInterceptFieldsSubclass extends TestInterceptFields {
         assertTrue( "super class read field", readTest  );
         assertTrue( "super class write field", readTest  );
     }
+
+    @Override
     public Object readObject(Object _this, String name, Object oldValue) {
        if(name.equals("field")){
            readTest = true;
@@ -46,6 +48,7 @@ public class TestInterceptFieldsSubclass extends TestInterceptFields {
        return super.readObject(_this, name, oldValue);
     }
 
+    @Override
     public Object writeObject(Object _this, String name, Object oldValue,
             Object newValue) {
 

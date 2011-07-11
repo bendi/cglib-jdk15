@@ -94,6 +94,7 @@ abstract public class MulticastDelegate<T> implements Cloneable {
             super(SOURCE);
         }
 
+        @Override
         protected ClassLoader getDefaultClassLoader() {
             return iface.getClassLoader();
         }

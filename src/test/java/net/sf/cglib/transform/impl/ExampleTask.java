@@ -25,10 +25,12 @@ public class ExampleTask extends AbstractTransformTask {
     private String fieldSuffix = "";
     private ClassTransformer transformer;
 
+    @Override
     protected ClassTransformer getClassTransformer(String name[]) {
         return transformer;
     }
 
+    @Override
     protected void beforeExecute() {
         ClassTransformer t1 = new AccessFieldTransformer(new AccessFieldTransformer.Callback() {
             public String getPropertyName(Type owner, String fieldName) {

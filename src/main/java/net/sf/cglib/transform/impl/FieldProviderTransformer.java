@@ -56,6 +56,7 @@ public class FieldProviderTransformer extends ClassEmitterTransformer {
     private int access;
     private Map<String, Type> fields;
 
+    @Override
     public void begin_class(int version, int access, String className, Type superType, Type[] interfaces, String sourceFile) {
         if (!TypeUtils.isAbstract(access)) {
             interfaces = TypeUtils.add(interfaces, FIELD_PROVIDER);
@@ -65,6 +66,7 @@ public class FieldProviderTransformer extends ClassEmitterTransformer {
         super.begin_class(version, access, className, superType, interfaces, sourceFile);
     }
 
+    @Override
     public void declare_field(int access, String name, Type type, Object value) {
         super.declare_field(access, name, type, value);
 
@@ -73,6 +75,7 @@ public class FieldProviderTransformer extends ClassEmitterTransformer {
         }
     }
 
+    @Override
     public void end_class() {
         if (!TypeUtils.isInterface(access)) {
             try {

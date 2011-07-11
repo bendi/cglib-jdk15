@@ -103,6 +103,7 @@ abstract public class StringSwitcher {
             this.fixedInput = fixedInput;
         }
 
+        @Override
         protected ClassLoader getDefaultClassLoader() {
             return getClass().getClassLoader();
         }

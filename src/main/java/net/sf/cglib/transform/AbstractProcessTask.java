@@ -48,11 +48,12 @@ abstract public class AbstractProcessTask extends Task {
 
 
 
+    @Override
     public void execute() throws BuildException {
         beforeExecute();
         for (Iterator<File> it = getFiles().iterator(); it.hasNext();) {
             try {
-                processFile((File)it.next());
+                processFile(it.next());
             } catch (Exception e) {
                  throw new BuildException(e);
             }

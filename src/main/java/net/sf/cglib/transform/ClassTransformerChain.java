@@ -19,11 +19,12 @@ import org.objectweb.asm.*;
 
 public class ClassTransformerChain extends AbstractClassTransformer {
     private ClassTransformer[] chain;
-    
+
     public ClassTransformerChain(ClassTransformer[] chain) {
         this.chain = (ClassTransformer[])chain.clone();
     }
 
+    @Override
     public void setTarget(ClassVisitor v) {
         super.setTarget(chain[0]);
         ClassVisitor next = v;
@@ -33,6 +34,7 @@ public class ClassTransformerChain extends AbstractClassTransformer {
         }
     }
 
+    @Override
     public MethodVisitor visitMethod(int access,
                                      String name,
                                      String desc,
@@ -41,6 +43,7 @@ public class ClassTransformerChain extends AbstractClassTransformer {
         return cv.visitMethod(access, name, desc, signature, exceptions);
     }
 
+    @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
         sb.append("ClassTransformerChain{");

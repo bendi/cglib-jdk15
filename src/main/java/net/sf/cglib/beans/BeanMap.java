@@ -115,6 +115,7 @@ abstract public class BeanMap implements Map<Object,Object> {
             this.require = require;
         }
 
+        @Override
         protected ClassLoader getDefaultClassLoader() {
             return beanClass.getClassLoader();
         }
@@ -247,6 +248,7 @@ abstract public class BeanMap implements Map<Object,Object> {
     }
 
     @SuppressWarnings("unchecked")
+    @Override
 	public boolean equals(Object o) {
         if (o == null || !(o instanceof Map)) {
             return false;
@@ -269,6 +271,7 @@ abstract public class BeanMap implements Map<Object,Object> {
         return true;
     }
 
+    @Override
     public int hashCode() {
         int code = 0;
         for (Iterator<Object> it = keySet().iterator(); it.hasNext();) {
@@ -302,6 +305,7 @@ abstract public class BeanMap implements Map<Object,Object> {
     /*
      * @see java.util.AbstractMap#toString
      */
+    @Override
     public String toString()
     {
         StringBuffer sb = new StringBuffer();

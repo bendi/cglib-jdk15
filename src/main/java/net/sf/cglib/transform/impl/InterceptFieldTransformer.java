@@ -45,6 +45,7 @@ public class InterceptFieldTransformer extends ClassEmitterTransformer {
         this.filter = filter;
     }
 
+    @Override
     public void begin_class(int version, int access, String className, Type superType, Type[] interfaces, String sourceFile) {
         if (!TypeUtils.isInterface(access)) {
             super.begin_class(version, access, className, superType, TypeUtils.add(interfaces, ENABLED), sourceFile);
@@ -72,6 +73,7 @@ public class InterceptFieldTransformer extends ClassEmitterTransformer {
         }
     }
 
+    @Override
     public void declare_field(int access, String name, Type type, Object value) {
         super.declare_field(access, name, type, value);
         if (!TypeUtils.isStatic(access)) {
@@ -143,8 +145,10 @@ public class InterceptFieldTransformer extends ClassEmitterTransformer {
         e.end_method();
     }
 
+    @Override
     public CodeEmitter begin_method(int access, Signature sig, Type[] exceptions) {
         return new CodeEmitter(super.begin_method(access, sig, exceptions)) {
+            @Override
             public void visitFieldInsn(int opcode, String owner, String name, String desc) {
                 Type towner = TypeUtils.fromInternalName(owner);
                 switch (opcode) {

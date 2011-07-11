@@ -48,6 +48,7 @@ public class TestBeanMapProxy extends net.sf.cglib.CodeGenTestCase {
         return new TestSuite(TestBeanMapProxy.class);
     }
 
+    @Override
     public void perform(ClassLoader loader) throws Throwable {
       //nothing to test at this time
     }

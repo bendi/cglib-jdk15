@@ -67,15 +67,19 @@ public class ClassEmitter extends ClassAdapter {
     public void begin_class(int version, final int access, String className, final Type superType, final Type[] interfaces, String source) {
         final Type classType = Type.getType("L" + className.replace('.', '/') + ";");
         classInfo = new ClassInfo() {
+            @Override
             public Type getType() {
                 return classType;
             }
+            @Override
             public Type getSuperType() {
                 return (superType != null) ? superType : Constants.TYPE_OBJECT;
             }
+            @Override
             public Type[] getInterfaces() {
                 return interfaces;
             }
+            @Override
             public int getModifiers() {
                 return access;
             }
@@ -149,9 +153,11 @@ public class ClassEmitter extends ClassAdapter {
         if (sig.equals(Constants.SIG_STATIC) && !TypeUtils.isInterface(getAccess())) {
             rawStaticInit = v;
             MethodVisitor wrapped = new MethodAdapter(v) {
+                @Override
                 public void visitMaxs(int maxStack, int maxLocals) {
                     // ignore
                 }
+                @Override
                 public void visitInsn(int insn) {
                     if (insn != Constants.RETURN) {
                         super.visitInsn(insn);
@@ -168,6 +174,7 @@ public class ClassEmitter extends ClassAdapter {
             return staticInit;
         } else if (sig.equals(staticHookSig)) {
             return new CodeEmitter(this, v, access, sig, exceptions) {
+                @Override
                 public boolean isStaticHook() {
                     return true;
                 }
@@ -220,6 +227,7 @@ public class ClassEmitter extends ClassAdapter {
             this.value = value;
         }
 
+        @Override
         public boolean equals(Object o) {
             if (o == null)
                 return false;
@@ -238,11 +246,13 @@ public class ClassEmitter extends ClassAdapter {
             return true;
         }
 
+        @Override
         public int hashCode() {
             return access ^ name.hashCode() ^ type.hashCode() ^ ((value == null) ? 0 : value.hashCode());
         }
     }
 
+    @Override
     public void visit(int version,
                       int access,
                       String name,
@@ -257,10 +267,12 @@ public class ClassEmitter extends ClassAdapter {
                     null); // TODO
     }
 
+    @Override
     public void visitEnd() {
         end_class();
     }
 
+    @Override
     public FieldVisitor visitField(int access,
                                    String name,
                                    String desc,
@@ -270,6 +282,7 @@ public class ClassEmitter extends ClassAdapter {
         return null; // TODO
     }
 
+    @Override
     public MethodVisitor visitMethod(int access,
                                      String name,
                                      String desc,

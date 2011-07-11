@@ -80,6 +80,7 @@ public class TestEnhancer extends CodeGenTestCase {
 
 			private static final long serialVersionUID = 1L;
 
+		    @Override
 			public Object afterReturn(  Object obj, Method method,
             Object args[],
             boolean invokedSuper, Object retValFromSuper,
@@ -314,6 +315,7 @@ public class TestEnhancer extends CodeGenTestCase {
 
     }
     public static class TestCloneImpl implements TestClone{
+        @Override
      public Object clone()throws java.lang.CloneNotSupportedException{
          return super.clone();
      }
@@ -455,9 +457,11 @@ public class TestEnhancer extends CodeGenTestCase {
       e.setUseCache(false);
       e.setUseFactory(false);
       e.setNamingPolicy(new DefaultNamingPolicy() {
+	    @Override
         public String getTag() {
           return "ByHerby";
         }
+	    @Override
           public String toString() {
             return getTag();
           }
@@ -584,6 +588,7 @@ public class TestEnhancer extends CodeGenTestCase {
             }
         }
 
+        @Override
         public boolean equals(Object other) {
             called = true;
             return super.equals(other);
@@ -692,6 +697,7 @@ public class TestEnhancer extends CodeGenTestCase {
          assertEquals("soda", newArgInit(clazz, "test").toString());
 
          Thread thread = new Thread(){
+        	    @Override
              public void run() {
                  assertEquals("soda", newArgInit(clazz, "test").toString());
              }
@@ -700,6 +706,7 @@ public class TestEnhancer extends CodeGenTestCase {
          thread.join();
     }
 
+    @Override
    public void perform(ClassLoader loader) throws Exception{
 
            enhance( Source.class , null, TEST_INTERCEPTOR, loader);
@@ -717,6 +724,7 @@ public class TestEnhancer extends CodeGenTestCase {
         Class<?>[] interfaces = new Class[]{ DI1.class, DI2.class };
 
         CallbackHelper<ArgInit> helper = new CallbackHelper<ArgInit>(sc, interfaces) {
+            @Override
             protected Object getCallback(final Method method) {
                 return new FixedValue() {
                     public Object loadObject() {
@@ -778,6 +786,7 @@ public class TestEnhancer extends CodeGenTestCase {
         public ConstructorCall() {
             x = toString();
         }
+        @Override
         public String toString() {
             return "foo";
         }
@@ -1025,6 +1034,7 @@ public class TestEnhancer extends CodeGenTestCase {
     static class Concrete {}
     static class ReverseImpl extends ReverseSuper<RetType> {
         public Refined aMethod(Concrete b, Refined c, RetType d, ErasedType e) { return null; }
+        @Override
         public RetType aMethod(Concrete b, RetType c, RetType d, ErasedType e) { return null; }
     }
 

@@ -65,6 +65,7 @@ public class TestAddClassInit extends AbstractTransformTest{
        super(s);
     }
 
+    @Override
     protected ClassTransformerFactory getTransformer() throws Exception{
 
        return new ClassTransformerFactory (){

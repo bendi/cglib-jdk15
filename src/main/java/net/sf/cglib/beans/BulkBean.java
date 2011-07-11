@@ -95,6 +95,7 @@ abstract public class BulkBean
             this.types = types;
         }
 
+        @Override
         protected ClassLoader getDefaultClassLoader() {
             return target.getClassLoader();
         }

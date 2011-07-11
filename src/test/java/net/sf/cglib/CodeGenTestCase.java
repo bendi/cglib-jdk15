@@ -16,19 +16,13 @@
 package net.sf.cglib;
 
 import java.io.*;
-import java.io.File;
-import java.io.InputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.*;
-import java.util.ArrayList;
-import java.util.StringTokenizer;
 
 import net.sf.cglib.core.KeyFactory;
 import net.sf.cglib.core.Signature;
 import net.sf.cglib.proxy.*;
-import net.sf.cglib.proxy.Callback;
-import net.sf.cglib.proxy.Factory;
 import net.sf.cglib.reflect.FastClass;
 
 import junit.framework.*;
@@ -73,6 +67,7 @@ abstract public class CodeGenTestCase extends TestCase {
 
         URLClassLoader loader = new URLClassLoader((URL[]) classPath.toArray(new URL[classPath.size()])){
 
+            @Override
             public Class<?> loadClass(String name) throws ClassNotFoundException {
 
                 String res = name.replace('.','/') + ".class";

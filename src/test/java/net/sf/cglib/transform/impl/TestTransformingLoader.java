@@ -125,6 +125,7 @@ public class TestTransformingLoader extends net.sf.cglib.CodeGenTestCase {
         return new TestSuite(TestTransformingLoader.class);
     }
 
+    @Override
     public void perform(ClassLoader loader) throws Throwable {
     }
 

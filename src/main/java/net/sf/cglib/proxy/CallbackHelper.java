@@ -82,11 +82,13 @@ implements CallbackFilter<T>
         return ((Integer)methodMap.get(method)).intValue();
     }
 
+    @Override
     public int hashCode()
     {
         return methodMap.hashCode();
     }
 
+    @Override
     public boolean equals(Object o)
     {
         if (o == null)

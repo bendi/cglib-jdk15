@@ -162,6 +162,7 @@ public class TestDelegates extends net.sf.cglib.CodeGenTestCase {
         return new TestSuite(TestDelegates.class);
     }
 
+    @Override
     public void perform(ClassLoader loader) throws Throwable {
     }
 

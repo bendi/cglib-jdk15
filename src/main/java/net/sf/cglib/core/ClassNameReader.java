@@ -37,6 +37,8 @@ public class ClassNameReader {
         final List<String> array = new ArrayList<String>();
         try {
             r.accept(new ClassAdapter(null) {
+
+                @Override
                 public void visit(int version,
                                   int access,
                                   String name,

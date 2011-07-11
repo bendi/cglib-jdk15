@@ -54,10 +54,12 @@ public class Signature {
         return Type.getArgumentTypes(desc);
     }
 
+    @Override
     public String toString() {
         return name + desc;
     }
 
+    @Override
     public boolean equals(Object o) {
         if (o == null)
             return false;
@@ -67,6 +69,7 @@ public class Signature {
         return name.equals(other.name) && desc.equals(other.desc);
     }
 
+    @Override
     public int hashCode() {
         return name.hashCode() ^ desc.hashCode();
     }

@@ -160,6 +160,7 @@ public class TestProxy extends CodeGenTestCase {
         return new TestSuite(TestProxy.class);
     }
 
+    @Override
     public void perform(ClassLoader loader) throws Throwable {
          InvocationHandler handler = new InvocationHandler() {
             public Object invoke(Object o, Method method, Object[] args) throws Exception {

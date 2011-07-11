@@ -10,6 +10,7 @@ public class EB extends EA implements Comparable<Object>{
 	public void setCount(int count) {
 		this.count = count;
 	}
+    @Override
         public final  void finalTest(){}
 }
 

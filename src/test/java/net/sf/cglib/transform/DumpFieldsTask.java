@@ -29,13 +29,14 @@ public class DumpFieldsTask extends AbstractProcessTask {
     public void setOutputFile(File outfile) {
         this.outfile = outfile;
     }
-    
+
+    @Override
     public void execute() throws BuildException {
         try {
             out = new PrintStream(new FileOutputStream(outfile));
             try{
                 super.execute();
-            }finally{ 
+            }finally{
                 out.close();
             }
         } catch (IOException e) {
@@ -43,13 +44,15 @@ public class DumpFieldsTask extends AbstractProcessTask {
         }
     }
 
+    @Override
     protected void processFile(File file) throws Exception {
         InputStream in = new BufferedInputStream(new FileInputStream(file));
         ClassReader r = new ClassReader(in);
         r.accept(new EmptyVisitor() {
             private String className;
 
-            public void visit(int version,
+           @Override
+           public void visit(int version,
                               int access,
                               String name,
                               String signature,
@@ -58,6 +61,7 @@ public class DumpFieldsTask extends AbstractProcessTask {
                 className = name.replace('/', '.');
             }
 
+            @Override
             public FieldVisitor visitField(int access,
                                            String name,
                                            String desc,

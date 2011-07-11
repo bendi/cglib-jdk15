@@ -19,7 +19,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.UndeclaredThrowableException;
 
 public final class ProxySample implements ProxySampleInterface_ReturnsObject, ProxySampleInterface_ReturnsBasic {
-	
+
 	private InvocationHandler handler = null;
 
     protected ProxySample(InvocationHandler handler) {
@@ -70,6 +70,7 @@ public final class ProxySample implements ProxySampleInterface_ReturnsObject, Pr
     /**
      * @see java.lang.Object#toString()
      */
+    @Override
     public String toString() {
         String result =  null;
         try {

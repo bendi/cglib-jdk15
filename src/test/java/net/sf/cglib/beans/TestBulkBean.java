@@ -211,6 +211,7 @@ public class TestBulkBean extends TestCase {
     private static class BulkBeanPlainImpl extends BulkBean {
 
 
+        @Override
         public void getPropertyValues(Object bean, Object[] values) {
 
             int i = 0;
@@ -233,6 +234,7 @@ public class TestBulkBean extends TestCase {
         }
 
 
+        @Override
         public void setPropertyValues(Object bean, Object[] values) {
 
             int i = 0;
@@ -293,6 +295,7 @@ public class TestBulkBean extends TestCase {
             }
         }
 
+        @Override
         public void getPropertyValues(Object bean, Object[] values) {
 
             try{
@@ -306,6 +309,7 @@ public class TestBulkBean extends TestCase {
             }
         }
 
+        @Override
         public void setPropertyValues(Object bean, Object[] values) {
             try{
 

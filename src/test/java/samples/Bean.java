@@ -22,6 +22,7 @@ public abstract class Bean implements java.io.Serializable{
       this.sampleProperty = value;
    }
 
+   @Override
    public String toString(){
      return "sampleProperty is " + sampleProperty;
    }

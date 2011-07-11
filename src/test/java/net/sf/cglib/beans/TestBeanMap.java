@@ -163,6 +163,7 @@ public class TestBeanMap extends net.sf.cglib.CodeGenTestCase {
         return new TestSuite(TestBeanMap.class);
     }
 
+    @Override
     public void perform(ClassLoader loader) throws Throwable {
         //tested in enhancer test unit
     }

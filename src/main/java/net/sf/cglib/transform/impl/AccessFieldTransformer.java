@@ -34,6 +34,7 @@ public class AccessFieldTransformer extends ClassEmitterTransformer {
         String getPropertyName(Type owner, String fieldName);
     }
 
+    @Override
     public void declare_field(int access, final String name, Type type, Object value) {
         super.declare_field(access, name, type, value);
 

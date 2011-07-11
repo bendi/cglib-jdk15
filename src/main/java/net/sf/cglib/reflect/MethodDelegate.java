@@ -196,6 +196,7 @@ abstract public class MethodDelegate {
             this.iface = iface;
         }
 
+        @Override
         protected ClassLoader getDefaultClassLoader() {
             return targetClass.getClassLoader();
         }

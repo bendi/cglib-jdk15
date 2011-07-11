@@ -39,7 +39,7 @@ import org.objectweb.asm.Type;
  * A {@link MethodAdapter} that renumbers local variables in their order of
  * appearance. This adapter allows one to easily add new local variables to a
  * method.
- * 
+ *
  * @author Chris Nokleberg
  * @author Eric Bruneton
  */
@@ -52,7 +52,7 @@ public class LocalVariablesSorter extends MethodAdapter {
      */
     private static class State
     {
-        int[] mapping = new int[40];        
+        int[] mapping = new int[40];
         int nextLocal;
     }
 
@@ -80,6 +80,7 @@ public class LocalVariablesSorter extends MethodAdapter {
         firstLocal = lvs.firstLocal;
     }
 
+    @Override
     public void visitVarInsn(final int opcode, final int var) {
         int size;
         switch (opcode) {
@@ -95,14 +96,17 @@ public class LocalVariablesSorter extends MethodAdapter {
         mv.visitVarInsn(opcode, remap(var, size));
     }
 
+    @Override
     public void visitIincInsn(final int var, final int increment) {
         mv.visitIincInsn(remap(var, 1), increment);
     }
 
+    @Override
     public void visitMaxs(final int maxStack, final int maxLocals) {
         mv.visitMaxs(maxStack, state.nextLocal);
     }
 
+    @Override
     public void visitLocalVariable(
         final String name,
         final String desc,

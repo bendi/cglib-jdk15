@@ -61,6 +61,7 @@ public class TestInterfaceMaker extends CodeGenTestCase
         junit.textui.TestRunner.main(testCaseName);
     }
 
+    @Override
     public void perform(ClassLoader loader) throws Throwable {
     }
 

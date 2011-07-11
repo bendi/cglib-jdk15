@@ -68,6 +68,7 @@ abstract public class ConstructorDelegate {
         	return KEY_FACTORY.newInstance(iface.getName(), targetClass.getName());
         }
 
+        @Override
         protected ClassLoader getDefaultClassLoader() {
             return targetClass.getClassLoader();
         }

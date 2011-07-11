@@ -397,6 +397,7 @@ public class Enhancer<T> extends AbstractClassGenerator<T>
                                                     serialVersionUID);
     }
 
+    @Override
     protected ClassLoader getDefaultClassLoader() {
         if (superclass != null) {
             return superclass.getClassLoader();

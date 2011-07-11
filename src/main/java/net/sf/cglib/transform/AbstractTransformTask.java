@@ -65,6 +65,7 @@ abstract public class AbstractTransformTask extends AbstractProcessTask {
         return null;
     }
 
+    @Override
     protected void processFile(File file) throws Exception {
 
         if (isClassFile(file)) {

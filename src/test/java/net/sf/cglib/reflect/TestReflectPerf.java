@@ -104,6 +104,7 @@ public class TestReflectPerf extends net.sf.cglib.CodeGenTestCase {
         return new TestSuite(TestReflectPerf.class);
     }
 
+    @Override
     public void perform(ClassLoader loader) throws Throwable {
     }
 

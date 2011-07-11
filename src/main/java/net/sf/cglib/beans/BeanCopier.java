@@ -81,6 +81,7 @@ abstract public class BeanCopier
             this.useConverter = useConverter;
         }
 
+        @Override
         protected ClassLoader getDefaultClassLoader() {
             return source.getClassLoader();
         }

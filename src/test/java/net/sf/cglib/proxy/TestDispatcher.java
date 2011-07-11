@@ -94,6 +94,7 @@ public class TestDispatcher extends CodeGenTestCase {
         return new TestSuite(TestDispatcher.class);
     }
 
+    @Override
     public void perform(ClassLoader loader) throws Throwable {
     }
 

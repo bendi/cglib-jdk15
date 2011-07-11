@@ -113,6 +113,7 @@ public class TestMixin extends CodeGenTestCase {
         return new TestSuite(TestMixin.class);
     }
 
+    @Override
     public void perform(ClassLoader loader) throws Throwable {
         Mixin.createBean(loader, new Object[]{ new DBean1(), new DBean2() });
     }

@@ -596,6 +596,7 @@ public class TestFastClass extends net.sf.cglib.CodeGenTestCase {
         return new TestSuite(TestFastClass.class);
     }
 
+    @Override
     public void perform(ClassLoader loader) throws Throwable {
         FastClass.create(loader,Simple.class).newInstance();
     }

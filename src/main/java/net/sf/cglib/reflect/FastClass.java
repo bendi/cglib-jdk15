@@ -65,6 +65,7 @@ abstract public class FastClass<T>
         	return type.getName();
         }
 
+        @Override
         protected ClassLoader getDefaultClassLoader() {
             return type.getClassLoader();
         }
@@ -126,14 +127,17 @@ abstract public class FastClass<T>
         return type;
     }
 
+    @Override
     public String toString() {
         return type.toString();
     }
 
+    @Override
     public int hashCode() {
         return type.hashCode();
     }
 
+    @Override
     public boolean equals(Object o) {
         if (o == null || !(o instanceof FastClass)) {
             return false;

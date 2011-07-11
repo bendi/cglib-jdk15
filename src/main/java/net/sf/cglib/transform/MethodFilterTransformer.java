@@ -21,13 +21,14 @@ public class MethodFilterTransformer extends AbstractClassTransformer {
     private MethodFilter filter;
     private ClassTransformer pass;
     private ClassVisitor direct;
-    
+
     public MethodFilterTransformer(MethodFilter filter, ClassTransformer pass) {
         this.filter = filter;
         this.pass = pass;
         super.setTarget(pass);
     }
 
+    @Override
     public MethodVisitor visitMethod(int access,
                                      String name,
                                      String desc,
@@ -35,7 +36,8 @@ public class MethodFilterTransformer extends AbstractClassTransformer {
                                      String[] exceptions) {
         return (filter.accept(access, name, desc, signature, exceptions) ? pass : direct).visitMethod(access, name, desc, signature, exceptions);
     }
-    
+
+    @Override
     public void setTarget(ClassVisitor target) {
         pass.setTarget(target);
         direct = target;

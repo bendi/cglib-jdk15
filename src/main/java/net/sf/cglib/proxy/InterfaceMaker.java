@@ -84,6 +84,7 @@ public class InterfaceMaker extends AbstractClassGenerator<Class<?>>
     	return this;
     }
 
+    @Override
     protected ClassLoader getDefaultClassLoader() {
         return null;
     }

@@ -72,10 +72,10 @@ public class TestProxyRefDispatcher extends CodeGenTestCase {
                 return (method.getDeclaringClass().equals(Foo.class)) ? 0 : 1;
             }
         });
-        Object obj = e.create();
+        Foo obj = e.create();
 
         assertNull(proxyReference[0]);
-        assertTrue(((Foo)obj).foo().equals("foo1"));
+        assertTrue(obj.foo().equals("foo1"));
         assertSame(obj, proxyReference[0]);
         proxyReference[0] = null;
         assertTrue(((Bar)obj).bar().equals("bar1"));
@@ -87,7 +87,7 @@ public class TestProxyRefDispatcher extends CodeGenTestCase {
                 return "foo2";
             }
         };
-        assertTrue(((Foo)obj).foo().equals("foo2"));
+        assertTrue(obj.foo().equals("foo2"));
         assertSame(obj, proxyReference[0]);
     }
 
@@ -103,6 +103,7 @@ public class TestProxyRefDispatcher extends CodeGenTestCase {
         return new TestSuite(TestProxyRefDispatcher.class);
     }
 
+    @Override
     public void perform(ClassLoader loader) throws Throwable {
     }
 

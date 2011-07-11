@@ -60,6 +60,7 @@ public class BeanGenerator<T> extends AbstractClassGenerator<T>
         props.put(name, Type.getType(type));
     }
 
+    @Override
     protected ClassLoader getDefaultClassLoader() {
         if (superclass != null) {
             return superclass.getClassLoader();

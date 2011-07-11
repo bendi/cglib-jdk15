@@ -52,6 +52,7 @@ public class AddDelegateTransformer extends ClassEmitterTransformer {
         }
     }
 
+    @Override
     public void begin_class(int version, int access, String className, Type superType, Type[] interfaces, String sourceFile) {
 
         if(!TypeUtils.isInterface(access)){
@@ -76,11 +77,13 @@ public class AddDelegateTransformer extends ClassEmitterTransformer {
         }
     }
 
+    @Override
     public CodeEmitter begin_method(int access, Signature sig, Type[] exceptions) {
         final CodeEmitter e = super.begin_method(access, sig, exceptions);
         if (sig.getName().equals(Constants.CONSTRUCTOR_NAME)) {
             return new CodeEmitter(e) {
                 private boolean transformInit = true;
+                @Override
                 public void visitMethodInsn(int opcode, String owner, String name, String desc) {
                     super.visitMethodInsn(opcode, owner, name, desc);
                     if (transformInit && opcode == Constants.INVOKESPECIAL) {
