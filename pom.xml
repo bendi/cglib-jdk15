@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>cglib</groupId>
 	<artifactId>cglib-root</artifactId>
-	<name>Code Generation Library</name>
+	<name>Code Generation Library (parent)</name>
 	<url>http://cglib.sourceforge.net/</url>
 	<description>Code generation library</description>
 	<packaging>pom</packaging>
@@ -14,6 +14,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<cglib.version>2.2.2</cglib.version>
+		<wagon-ftp.version>1.0-beta-7</wagon-ftp.version>
 	</properties>
 
 	<licenses>
@@ -24,8 +25,25 @@
 		</license>
 	</licenses>
 
+	<build>
+		<extensions>
+			<extension>
+				<groupId>org.apache.maven.wagon</groupId>
+				<artifactId>wagon-ftp</artifactId>
+				<version>${wagon-ftp.version}</version>
+			</extension>
+		</extensions>
+	</build>
+
 	<modules>
 		<module>cglib</module>
 		<module>cglib-nodep</module>
 	</modules>
+
+	<distributionManagement>
+		<repository>
+			<id>repo.bedkowski.pl</id>
+			<url>ftp://bendi.vot.pl/maven2</url>
+		</repository>
+	</distributionManagement>
 </project>

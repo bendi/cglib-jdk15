@@ -4,9 +4,9 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>cglib</groupId>
 	<artifactId>cglib-nodep</artifactId>
-	<name>Code Generation Library</name>
+	<name>Code Generation Library (nodep)</name>
 	<url>http://cglib.sourceforge.net/</url>
-	<description>Code generation library</description>
+	<description>Code generation library (nodep)</description>
 
 	<parent>
 		<groupId>cglib</groupId>
@@ -61,15 +61,6 @@
 		</developer>
 	</developers>
 	<build>
-		<resources>
-			<resource>
-				<directory>src/main/resources</directory>
-				<includes>
-					<include>asm*.txt</include>
-				</includes>
-			</resource>
-		</resources>
-
 		<plugins>
 			<plugin>
 				<artifactId>maven-jar-plugin</artifactId>
@@ -101,8 +92,6 @@
 									<result>net.sf.cglib.@1</result>
 								</rule>
 							</rules>
-							<input>target/classes</input>
-							<output>target/jarjar-classes</output>
 						</configuration>
 					</execution>
 				</executions>

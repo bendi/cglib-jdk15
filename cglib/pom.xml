@@ -4,9 +4,9 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>cglib</groupId>
 	<artifactId>cglib</artifactId>
-	<name>Code Generation Library</name>
+	<name>Code Generation Library (cglib)</name>
 	<url>http://cglib.sourceforge.net/</url>
-	<description>Code generation library</description>
+	<description>Code generation library (cglib)</description>
 
   <parent>
     <groupId>cglib</groupId>
