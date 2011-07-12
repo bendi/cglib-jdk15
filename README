@@ -1,0 +1,5 @@
+This is a jdk1.5 compatible version of cglib library.
+
+In order to use it you need to add my local repository:
+
+http://repo.bedkowski.pl/maven2/
