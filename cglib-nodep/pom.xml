@@ -7,6 +7,7 @@
 	<name>Code Generation Library (nodep)</name>
 	<url>http://cglib.sourceforge.net/</url>
 	<description>Code generation library (nodep)</description>
+	<packaging>jar</packaging>
 
 	<parent>
 		<groupId>cglib</groupId>
