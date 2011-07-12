@@ -1,0 +1,188 @@
+<?xml version="1.0"?>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>cglib</groupId>
+	<artifactId>cglib</artifactId>
+	<name>Code Generation Library</name>
+	<url>http://cglib.sourceforge.net/</url>
+	<description>Code generation library</description>
+
+  <parent>
+    <groupId>cglib</groupId>
+    <artifactId>cglib-root</artifactId>
+    <version>1</version>
+  </parent>
+
+	<version>${cglib.version}</version>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+
+	<licenses>
+		<license>
+			<name>ASF 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	<!-- <scm> <connection>git://github.com/bendi/cglib-jdk15.git</connection>
+		<url>http://github.com/bendi/cglib-jdk15.git</url> </scm> -->
+	<!-- <scm> <connection>scm:cvs:pserver:anonymous@cglib.cvs.sourceforge.net:/cvsroot/cglib:cglib</connection>
+		<url>http://cglib.cvs.sourceforge.net/cglib</url> </scm> -->
+	<dependencies>
+		<dependency>
+			<groupId>asm</groupId>
+			<artifactId>asm</artifactId>
+			<version>3.3.1</version>
+		</dependency>
+		<dependency>
+			<groupId>asm</groupId>
+			<artifactId>asm-util</artifactId>
+			<version>3.3.1</version>
+		</dependency>
+		<dependency>
+			<groupId>ant</groupId>
+			<artifactId>ant</artifactId>
+			<version>1.6.2</version>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.8.2</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>asm</groupId>
+			<artifactId>asm-commons</artifactId>
+			<version>3.3.1</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+	<developers>
+		<developer>
+			<id>baliuka</id>
+			<name>Juozas Baliuka</name>
+		</developer>
+		<developer>
+			<id>herbyderby</id>
+			<name>Chris Nokleberg</name>
+		</developer>
+		<developer>
+			<id>sameb</id>
+			<name>Sam Berlin</name>
+		</developer>
+	</developers>
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<includes>
+					<include>LICENSE</include>
+					<include>NOTICE</include>
+				</includes>
+			</resource>
+		</resources>
+
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.9</version>
+				<configuration>
+					<includes>
+						<include>net/sf/cglib/TestAll.java</include>
+					</includes>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.3.2</version>
+				<configuration>
+					<source>1.5</source>
+					<target>1.5</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<classifier>jdk15</classifier>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.8</version>
+				<configuration>
+					<show>public</show>
+					<excludePackageNames>org.asm.*</excludePackageNames>
+					<bottom>Copyright (c) 2001 - Apache Software Foundation</bottom>
+					<author>true</author>
+					<doctitle>cglib</doctitle>
+					<windowtitle>cglib ${project.version} API</windowtitle>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jxr-plugin</artifactId>
+				<version>2.2</version>
+				<configuration>
+					<linkJavadoc>true</linkJavadoc>
+					<javadocDir>target/site/apidocs</javadocDir>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+	<profiles>
+		<profile>
+			<id>cglib-nodep</id>
+			<build>
+				<resources>
+					<resource>
+						<directory>src/main/resources</directory>
+						<includes>
+							<include>asm*.txt</include>
+						</includes>
+					</resource>
+				</resources>
+				<plugins>
+					<plugin>
+						<artifactId>maven-jar-plugin</artifactId>
+						<configuration>
+							<classifier>nodep-jdk15</classifier>
+							<classesDirectory>target/jarjar-classes</classesDirectory>
+						</configuration>
+					</plugin>
+					<plugin>
+						<groupId>org.sonatype.plugins</groupId>
+						<artifactId>jarjar-maven-plugin</artifactId>
+						<executions>
+							<execution>
+								<phase>prepare-package</phase>
+								<goals>
+									<goal>jarjar</goal>
+								</goals>
+								<configuration>
+									<includes>
+										<include>asm:asm</include>
+									</includes>
+									<rules>
+										<rule>
+											<pattern>org.objectweb.asm.**</pattern>
+											<result>net.sf.cglib.asm.@1</result>
+										</rule>
+									</rules>
+									<input>target/classes</input>
+									<output>target/jarjar-classes</output>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+</project>

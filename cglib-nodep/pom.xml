@@ -1,0 +1,112 @@
+<?xml version="1.0"?>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>cglib</groupId>
+	<artifactId>cglib-nodep</artifactId>
+	<name>Code Generation Library</name>
+	<url>http://cglib.sourceforge.net/</url>
+	<description>Code generation library</description>
+
+	<parent>
+		<groupId>cglib</groupId>
+		<artifactId>cglib-root</artifactId>
+		<version>1</version>
+	</parent>
+
+	<version>${cglib.version}</version>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+
+	<licenses>
+		<license>
+			<name>ASF 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	<!-- <scm> <connection>git://github.com/bendi/cglib-jdk15.git</connection>
+		<url>http://github.com/bendi/cglib-jdk15.git</url> </scm> -->
+	<!-- <scm> <connection>scm:cvs:pserver:anonymous@cglib.cvs.sourceforge.net:/cvsroot/cglib:cglib</connection>
+		<url>http://cglib.cvs.sourceforge.net/cglib</url> </scm> -->
+	<dependencies>
+		<dependency>
+			<groupId>asm</groupId>
+			<artifactId>asm</artifactId>
+			<version>3.3.1</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>cglib</groupId>
+			<artifactId>cglib</artifactId>
+			<classifier>jdk15</classifier>
+			<version>${cglib.version}</version>
+			<scope>compile</scope>
+		</dependency>
+	</dependencies>
+	<developers>
+		<developer>
+			<id>baliuka</id>
+			<name>Juozas Baliuka</name>
+		</developer>
+		<developer>
+			<id>herbyderby</id>
+			<name>Chris Nokleberg</name>
+		</developer>
+		<developer>
+			<id>sameb</id>
+			<name>Sam Berlin</name>
+		</developer>
+	</developers>
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<includes>
+					<include>asm*.txt</include>
+				</includes>
+			</resource>
+		</resources>
+
+		<plugins>
+			<plugin>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<classifier>jdk15</classifier>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.sonatype.plugins</groupId>
+				<artifactId>jarjar-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>jarjar</goal>
+						</goals>
+						<configuration>
+							<includes>
+								<include>asm:asm</include>
+								<include>cglib:cglib</include>
+							</includes>
+							<rules>
+								<rule>
+									<pattern>org.objectweb.asm.**</pattern>
+									<result>net.sf.cglib.asm.@1</result>
+								</rule>
+								<rule>
+									<pattern>net.sf.cglib.**</pattern>
+									<result>net.sf.cglib.@1</result>
+								</rule>
+							</rules>
+							<input>target/classes</input>
+							<output>target/jarjar-classes</output>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+</project>
